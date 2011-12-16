@@ -12,7 +12,7 @@
 #include "./util/log.c"
 #include "./util/signals.c"
 
-#define SERVER_PORT "8888"
+#define SERVER_PORT "31337"
 #define MAX_DATA_SIZE 5000
 
 int server_socket;
