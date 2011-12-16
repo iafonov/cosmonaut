@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -11,8 +12,10 @@
 #include "./util/log.c"
 #include "./util/signals.c"
 
-#define SERVER_PORT "2332"
+#define SERVER_PORT "8888"
 #define MAX_DATA_SIZE 5000
+
+int server_socket;
 
 void reset_hints(struct addrinfo *hints) {
   memset(hints, 0, sizeof *hints);
@@ -27,7 +30,6 @@ void *get_in_addr(struct sockaddr *sa) {
 
 int bind_server() {
   int status;
-  int server_socket;
   struct sockaddr_storage;
   struct addrinfo hints;
   struct addrinfo *servinfo;
@@ -70,12 +72,14 @@ int main(int argc, char *argv[]) {
   int numbytes = 0;
 
   while(1) {
+    print_log("running accept");
     new_fd = accept(server_socket, (struct sockaddr *)&their_addr, &addr_size);
 
     inet_ntop(AF_INET, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
     print_log("server: got connection from %s", s);
 
-    if (fork()) {
+    if (!fork()) {
+      print_log("child process spawned");
       close(server_socket);
 
       numbytes = recv(new_fd, &buf, MAX_DATA_SIZE, 0);
@@ -89,7 +93,7 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
 
-    shutdown(new_fd, SHUT_RDWR);
+    close(new_fd);
   }
 
   return 0;
