@@ -1,0 +1,5 @@
+Properly catch signals
+Free port after stop
+Check that port is available on start
+Do proper streaming with recv/send
+Fork shit
