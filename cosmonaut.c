@@ -1,23 +1,14 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include "cosmonaut.h"
 
-#define SERVER_PORT "31337"
-#define SOCKET_QUEUE_SIZE 50
-
-#include "./util/log.h"
-#include "./util/signals.h"
-#include "./util/networking.h"
-#include "./util/base_request_handler.h"
-
+struct GlobalConfig global_config;
 sig_atomic_t server_socket_fd;
 
 int main(int argc, char *argv[]) {
   int new_connection_fd;
 
-  server_socket_fd = bind_server_socket_fd(SERVER_PORT);
+  load_configuration(CONFIG_FILE);
+
+  server_socket_fd = bind_server_socket_fd(global_config.server_port);
   setup_signal_listeners(server_socket_fd);
 
   while(1) {

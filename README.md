@@ -45,11 +45,17 @@ http://www.delorie.com/gnu/docs/glibc/libc_496.html
 ### Cool trick to eliminate useless variables
 
     int yes = 1;
-    setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (int[]){1}, sizeof(int)) == -1)
+    setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (&yes, sizeof(int)) == -1)
 
 vs.
 
     setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (int[]){1}, sizeof(int))
+
+### Configuration parsing
+
+Ini-format file parser.
+
+* https://github.com/ndevilla/iniparser
 
 ## Links
 
