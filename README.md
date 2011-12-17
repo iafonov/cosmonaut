@@ -14,6 +14,9 @@ Fast multithreaded web server written in C. Just for fun.
 
 ### Project structure
 
+This is very very very important because the later you realize that your project structure is full of shit the harder it would be to do it in a right way. Use make, don't try to use rake for a C project. It doesn't work well. (At least for me it didn't)
+
+* http://c.learncodethehardway.org/book/learn-c-the-hard-waych27.html
 * http://www.gnu.org/software/automake/manual/automake.html#Hello-World
 * http://mij.oltrelinux.com/devel/autoconf-automake/
 
