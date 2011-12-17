@@ -17,20 +17,20 @@ void sigint_handler(int signal) {
   exit(0);
 }
 
-void setup_signal_listeners() {
+void set_handler(int signal, void* handler) {
   struct sigaction sa;
-  sa.sa_handler = sigchld_handler;
+  sa.sa_handler = handler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
 
-  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-    exit(1);
+  if (sigaction(signal, &sa, NULL) == -1) {
+    die("can't set sigaction");
   }
+}
 
-  sa.sa_handler = sigint_handler;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = SA_RESTART;
+void setup_signal_listeners() {
+  set_handler(SIGCHLD, sigchld_handler);
 
-  sigaction(SIGINT, &sa, 0);
-  sigaction(SIGTERM, &sa, 0);
+  set_handler(SIGINT, sigint_handler);
+  set_handler(SIGTERM, sigint_handler);
 }
