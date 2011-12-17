@@ -10,3 +10,8 @@ desc "Run"
 task :run do
   system('./cosmonaut')
 end
+
+desc "Clean repo from autoconf temfiles"
+task :clean do
+  
+end

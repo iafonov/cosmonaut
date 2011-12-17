@@ -12,6 +12,11 @@ Fast multithreaded web server written in C. Just for fun.
 
 ## Interesting things
 
+### Project structure
+
+* http://www.gnu.org/software/automake/manual/automake.html#Hello-World
+* http://mij.oltrelinux.com/devel/autoconf-automake/
+
 ### Fork a process
 
 Fork returns new process pid into new process and 0 to parent process thus everything inside `if` block would be executed in a new process. Don't forget to call `exit(0)` to prevent accidental fall-through.
