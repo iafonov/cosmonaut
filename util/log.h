@@ -15,6 +15,6 @@
 #define warn(M, ...) fprintf(stderr, "[WARN] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #define info(M, ...) fprintf(stderr, "[INFO] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
-#define bail_out(M, ...) err(##__VA_ARGS__);exit(1);
+#define die(M, ...) err(##__VA_ARGS__);exit(1);
 
 #endif

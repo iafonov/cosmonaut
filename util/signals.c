@@ -8,11 +8,11 @@ void sigchld_handler(int signal) {
 }
 
 void sigint_handler(int signal) {
-  int yes=1;
+  int yes = 1;
 
   info("bye");
   if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-    bail_out("port unbind failed")
+    die("port unbind failed")
   }
   exit(0);
 }

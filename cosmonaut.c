@@ -37,17 +37,17 @@ int bind_server() {
   reset_hints(&hints);
 
   if ((status = getaddrinfo(NULL, SERVER_PORT, &hints, &servinfo)) != 0) {
-    bail_out(gai_strerror(status));
+    die(gai_strerror(status));
   }
 
   server_socket = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
   if ((status = bind(server_socket, servinfo->ai_addr, servinfo->ai_addrlen)) != 0) {
-    bail_out(gai_strerror(status));
+    die(gai_strerror(status));
   }
 
   if ((status = listen(server_socket, 20)) != 0) {
-    bail_out(gai_strerror(status));
+    die(gai_strerror(status));
   }
 
   info("starting on port %s", SERVER_PORT);
