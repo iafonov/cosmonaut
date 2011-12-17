@@ -14,7 +14,7 @@ Fast multithreaded web server written in C. Just for fun.
 
 ### Fork a process
 
-Fork returns new process pid into new process and 0 to parent process thus everything inside `if` block would be executed in a new process. Don't forget to call `exit(0)` to prevent accidental fall-trough.
+Fork returns new process pid into new process and 0 to parent process thus everything inside `if` block would be executed in a new process. Don't forget to call `exit(0)` to prevent accidental fall-through.
 
     if (!fork()) {
       do_something();
@@ -41,6 +41,15 @@ http://www.delorie.com/gnu/docs/glibc/libc_496.html
 `accept` - gets connection from queue and returns new socket file descriptor for it.
 
 * http://linux.die.net/man/2/accept
+
+### Cool trick to eliminate useless variables
+
+    int yes = 1;
+    setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (int[]){1}, sizeof(int)) == -1)
+
+vs.
+
+    setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (int[]){1}, sizeof(int))
 
 ## Links
 

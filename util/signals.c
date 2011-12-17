@@ -10,10 +10,8 @@ void sigchld_handler(int signal) {
 }
 
 void sigint_handler(int signal) {
-  int yes = 1;
-
   info("closing server socket %d", server_socket_fd);
-  if (setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+  if (setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (int[]){1}, sizeof(int)) == -1) {
     die("port unbind failed")
   }
   exit(0);

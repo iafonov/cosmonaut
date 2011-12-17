@@ -15,9 +15,10 @@
 sig_atomic_t server_socket_fd;
 
 int main(int argc, char *argv[]) {
+  int new_connection_fd;
+
   server_socket_fd = bind_server_socket_fd(SERVER_PORT);
   setup_signal_listeners(server_socket_fd);
-  int new_connection_fd;
 
   while(1) {
     new_connection_fd = accept_connection();
