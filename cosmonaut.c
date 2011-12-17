@@ -9,8 +9,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
-#include "./util/log.c"
-#include "./util/signals.c"
+#include "./util/log.h"
+#include "./util/signals.h"
 
 #define SERVER_PORT "31337"
 #define MAX_DATA_SIZE 5000
@@ -37,23 +37,20 @@ int bind_server() {
   reset_hints(&hints);
 
   if ((status = getaddrinfo(NULL, SERVER_PORT, &hints, &servinfo)) != 0) {
-    print_log("error: %s\n", gai_strerror(status));
-    exit(1);
+    bail_out(gai_strerror(status));
   }
 
   server_socket = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
   if ((status = bind(server_socket, servinfo->ai_addr, servinfo->ai_addrlen)) != 0) {
-    print_log("error: %s\n", gai_strerror(status));
-    exit(1);
+    bail_out(gai_strerror(status));
   }
 
   if ((status = listen(server_socket, 20)) != 0) {
-    print_log("error: %s\n", gai_strerror(status));
-    exit(1);
+    bail_out(gai_strerror(status));
   }
 
-  print_log("started on port %s", SERVER_PORT);
+  info("starting on port %s", SERVER_PORT);
 
   // clean up
   freeaddrinfo(servinfo);
@@ -65,29 +62,28 @@ int main(int argc, char *argv[]) {
   struct sockaddr their_addr;
   int new_fd;
   socklen_t addr_size = sizeof their_addr;
-  setup_signal_listener();
+  setup_signal_listeners();
   int server_socket = bind_server();
   char s[INET6_ADDRSTRLEN];
   char buf[MAX_DATA_SIZE];
   int numbytes = 0;
 
   while(1) {
-    print_log("running accept");
     new_fd = accept(server_socket, (struct sockaddr *)&their_addr, &addr_size);
 
     inet_ntop(AF_INET, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
-    print_log("server: got connection from %s", s);
+    info("server: got connection from %s", s);
 
     if (!fork()) {
-      print_log("child process spawned");
+      info("child process spawned");
       close(server_socket);
 
       numbytes = recv(new_fd, &buf, MAX_DATA_SIZE, 0);
       buf[numbytes] = '\0';
-      print_log("%s", buf);
+      warn("recv data:\n %s", buf);
 
       if (send(new_fd, "It works", 8, 0) == -1) {
-        print_log("error sending data");
+        err("can not send data to %s", s);
       }
       close(new_fd);
       exit(0);

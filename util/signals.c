@@ -1,4 +1,5 @@
 #include <signal.h>
+#include "log.h"
 
 extern int server_socket;
 
@@ -9,15 +10,14 @@ void sigchld_handler(int signal) {
 void sigint_handler(int signal) {
   int yes=1;
 
-  print_log("unbinding port");
+  info("bye");
   if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-    print_log("port unbind failed");
-    exit(1);
+    bail_out("port unbind failed")
   }
   exit(0);
 }
 
-void setup_signal_listener() {
+void setup_signal_listeners() {
   struct sigaction sa;
   sa.sa_handler = sigchld_handler;
   sigemptyset(&sa.sa_mask);
