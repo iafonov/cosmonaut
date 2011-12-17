@@ -4,66 +4,23 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
 #include "./util/log.h"
 #include "./util/signals.h"
+#include "./util/networking.h"
 
 #define SERVER_PORT "31337"
 #define MAX_DATA_SIZE 5000
 
 int server_socket;
 
-void reset_hints(struct addrinfo *hints) {
-  memset(hints, 0, sizeof *hints);
-  hints->ai_family   = AF_UNSPEC;      // v4/v6
-  hints->ai_socktype = SOCK_STREAM;    // TCP stream sockets
-  hints->ai_flags    = AI_PASSIVE;     // fill in my IP for me
-}
-
-void *get_in_addr(struct sockaddr *sa) {
-  return &(((struct sockaddr_in*)sa)->sin_addr);
-}
-
-int bind_server() {
-  int status;
-  struct sockaddr_storage;
-  struct addrinfo hints;
-  struct addrinfo *servinfo;
-
-  reset_hints(&hints);
-
-  if ((status = getaddrinfo(NULL, SERVER_PORT, &hints, &servinfo)) != 0) {
-    die(gai_strerror(status));
-  }
-
-  server_socket = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-
-  if ((status = bind(server_socket, servinfo->ai_addr, servinfo->ai_addrlen)) != 0) {
-    die(gai_strerror(status));
-  }
-
-  if ((status = listen(server_socket, 20)) != 0) {
-    die(gai_strerror(status));
-  }
-
-  info("starting on port %s", SERVER_PORT);
-
-  // clean up
-  freeaddrinfo(servinfo);
-
-  return server_socket;
-}
-
 int main(int argc, char *argv[]) {
   struct sockaddr their_addr;
   int new_fd;
   socklen_t addr_size = sizeof their_addr;
+
   setup_signal_listeners();
-  int server_socket = bind_server();
+  server_socket = bind_server_socket(SERVER_PORT);
+
   char s[INET6_ADDRSTRLEN];
   char buf[MAX_DATA_SIZE];
   int numbytes = 0;

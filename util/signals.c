@@ -1,4 +1,6 @@
-#include <signal.h>
+#include <sys/socket.h>
+
+#include "signal.h"
 #include "log.h"
 
 extern int server_socket;
