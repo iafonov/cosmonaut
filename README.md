@@ -20,6 +20,17 @@ This is very very very important because the later you realize that your project
 * http://www.gnu.org/software/automake/manual/automake.html#Hello-World
 * http://mij.oltrelinux.com/devel/autoconf-automake/
 
+### Make
+
+Hell on earth. Prepare drugs.
+
+Gathering dependency info.
+
+    dep:
+      $(CC) -MM *.c -I ../deps/iniparser/
+
+Forget about soft tabs, use only real tabs.
+
 ### Fork a process
 
 Fork returns new process pid into new process and 0 to parent process thus everything inside `if` block would be executed in a new process. Don't forget to call `exit(0)` to prevent accidental fall-through.
@@ -61,7 +72,7 @@ vs.
 
 ### Configuration parsing
 
-Ini-format file parser.
+ini-format file parser.
 
 * https://github.com/ndevilla/iniparser
 
