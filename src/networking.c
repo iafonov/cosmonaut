@@ -5,7 +5,11 @@
 #include <netdb.h>
 
 #include "networking.h"
+#include "global_config.h"
 #include "log.h"
+
+extern sig_atomic_t server_socket_fd;
+extern struct GlobalConfig global_config;
 
 void reset_hints(struct addrinfo *hints) {
   memset(hints, 0, sizeof *hints);
@@ -36,8 +40,7 @@ int bind_server_socket_fd(char* port) {
     die(gai_strerror(status));
   }
 
-  err("fucking warning");
-  if ((status = listen(server_socket_fd, 50)) != 0) {
+  if ((status = listen(server_socket_fd, global_config.socket_queue_size)) != 0) {
     die(gai_strerror(status));
   }
 

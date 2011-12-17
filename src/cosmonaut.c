@@ -10,8 +10,6 @@ sig_atomic_t server_socket_fd;
 #include "base_request_handler.h"
 #include "global_config.h"
 
-#define SERVER_PORT "31337"
-#define SOCKET_QUEUE_SIZE 50
 #define CONFIG_FILE "./config/cosmonaut.conf"
 
 int main(int argc, char *argv[]) {

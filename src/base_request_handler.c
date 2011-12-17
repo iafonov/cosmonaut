@@ -5,6 +5,8 @@
 #include "base_request_handler.h"
 #include "log.h"
 
+extern int server_socket_fd;
+
 void handle_request(int new_socket_fd) {
   // we are in a new child process
   char buf[MAX_DATA_SIZE];
