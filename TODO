@@ -4,3 +4,6 @@ Check that port is available on start
 Do proper streaming with recv/send
 + Fork shit
 Handle out of memory
+Use perror
+Free memory
+Config file

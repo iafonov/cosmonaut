@@ -14,7 +14,7 @@ void *get_in_addr(struct sockaddr *sa) {
   return &(((struct sockaddr_in*)sa)->sin_addr);
 }
 
-int bind_server_socket(char* port) {
+int bind_server_socket_fd(char* port) {
   int status;
   struct sockaddr_storage;
   struct addrinfo hints;
@@ -26,13 +26,13 @@ int bind_server_socket(char* port) {
     die(gai_strerror(status));
   }
 
-  server_socket = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+  server_socket_fd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
-  if ((status = bind(server_socket, servinfo->ai_addr, servinfo->ai_addrlen)) != 0) {
+  if ((status = bind(server_socket_fd, servinfo->ai_addr, servinfo->ai_addrlen)) != 0) {
     die(gai_strerror(status));
   }
 
-  if ((status = listen(server_socket, 20)) != 0) {
+  if ((status = listen(server_socket_fd, SOCKET_QUEUE_SIZE)) != 0) {
     die(gai_strerror(status));
   }
 
@@ -41,5 +41,19 @@ int bind_server_socket(char* port) {
   // clean up
   freeaddrinfo(servinfo);
 
-  return server_socket;
+  return server_socket_fd;
+}
+
+int accept_connection() {
+  int new_fd;
+  struct sockaddr their_addr;
+  socklen_t addr_size = sizeof their_addr;
+  char s[INET6_ADDRSTRLEN];
+
+  new_fd = accept(server_socket_fd, (struct sockaddr *)&their_addr, &addr_size);
+
+  inet_ntop(AF_INET, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
+  info("server: got connection from %s", s);
+
+  return new_fd;
 }

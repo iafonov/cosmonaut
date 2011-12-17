@@ -3,7 +3,7 @@
 #include "signal.h"
 #include "log.h"
 
-extern int server_socket;
+extern int server_socket_fd;
 
 void sigchld_handler(int signal) {
   while(waitpid(-1, NULL, WNOHANG) > 0);
@@ -12,8 +12,8 @@ void sigchld_handler(int signal) {
 void sigint_handler(int signal) {
   int yes = 1;
 
-  info("bye");
-  if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+  info("closing server socket %d", server_socket_fd);
+  if (setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
     die("port unbind failed")
   }
   exit(0);

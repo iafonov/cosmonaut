@@ -3,7 +3,7 @@
 
 #include "networking.c"
 
-void *get_in_addr(struct sockaddr *sa);
-int bind_server_socket(char* port);
+int bind_server_socket_fd(char* port);
+int accept_connection();
 
 #endif
