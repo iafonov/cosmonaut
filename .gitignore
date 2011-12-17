@@ -1,2 +1,7 @@
+.*.swp
+*.o
+*.rdb
+*.log
 cosmonaut
-cosmonaut.dSYM
+release
+src/cosmonaut.dSYM

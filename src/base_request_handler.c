@@ -1,4 +1,9 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/socket.h>
+
 #include "base_request_handler.h"
+#include "log.h"
 
 void handle_request(int new_socket_fd) {
   // we are in a new child process

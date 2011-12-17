@@ -1,7 +1,11 @@
+#include <stdlib.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+
+#include "networking.h"
+#include "log.h"
 
 void reset_hints(struct addrinfo *hints) {
   memset(hints, 0, sizeof *hints);
@@ -32,7 +36,8 @@ int bind_server_socket_fd(char* port) {
     die(gai_strerror(status));
   }
 
-  if ((status = listen(server_socket_fd, SOCKET_QUEUE_SIZE)) != 0) {
+  err("fucking warning");
+  if ((status = listen(server_socket_fd, 50)) != 0) {
     die(gai_strerror(status));
   }
 
