@@ -1,13 +1,9 @@
 require 'features/support/shell_out.rb'
 require 'features/support/cosmonaut.rb'
 
-cosmonaut = Cosmonaut.new
-cosmonaut.rebuild
-
-Before do
-  cosmonaut.start
-end
+COSMONAUT = Cosmonaut.new
+COSMONAUT.rebuild
 
 After do
-  cosmonaut.stop
+  COSMONAUT.stop
 end

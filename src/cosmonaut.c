@@ -9,13 +9,13 @@ sig_atomic_t server_socket_fd;
 #include "networking.h"
 #include "base_request_handler.h"
 #include "global_config.h"
-
-#define CONFIG_FILE "./config/cosmonaut.conf"
+#include "cli.h"
 
 int main(int argc, char *argv[]) {
   int new_connection_fd;
 
-  load_configuration(CONFIG_FILE);
+  parse_cli_params(&global_config, argc, argv);
+  load_configuration(&global_config);
 
   server_socket_fd = bind_server_socket_fd(global_config.server_port);
   setup_signal_listeners(server_socket_fd);
@@ -28,7 +28,6 @@ int main(int argc, char *argv[]) {
     }
 
     close(new_connection_fd);
-    
   }
 
   return 0;
