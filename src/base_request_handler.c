@@ -27,18 +27,21 @@ void send_405(int socket_fd) {
 void handle_request(int socket_fd) {
   char request_buffer[MAX_DATA_SIZE];
   int received = 0;
-  HTTPRequest request;
 
   close(server_socket_fd);
 
-  init_http_request(&request);
+  init_http_request();
 
   received = recv(socket_fd, &request_buffer, MAX_DATA_SIZE, 0);
   if (received < 0) {
     die("something went completely wrong while receiving data");
   }
 
-  parse_http_request(&request, request_buffer, received);
+  parse_http_request(request_buffer, received);
+
+  debug("request-path: [%s]", request.path);
+
+  send_405(socket_fd);
 
   // switch (request.method) {
   //   case GET:

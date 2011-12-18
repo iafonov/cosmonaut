@@ -84,7 +84,7 @@ http://www.delorie.com/gnu/docs/glibc/libc_496.html
 
 * http://linux.die.net/man/2/accept
 
-### C99 structures in-place initialization
+### C99 structure in-place initialization
 
     static http_parser_settings settings = {
       .on_message_begin = message_begin_cb,

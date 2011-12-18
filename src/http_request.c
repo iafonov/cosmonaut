@@ -1,47 +1,47 @@
-#include <pcre.h>
+#include <stdlib.h>
 
 #include "http_request.h"
 #include "string_util.h"
 #include "log.h"
 
+char* extract(const char *buf, size_t len) {
+  char *field = malloc(len + 1);
+  strncat(field, buf + 1, len);
+  field[len + 1] = '\0';
+
+  return field;
+}
+
 int request_url_cb(http_parser *p, const char *buf, size_t len) {
-  err("%s", buf);
+  request.path = extract(buf, len);
   return 0;
 }
 
 int header_field_cb(http_parser *p, const char *buf, size_t len) {
-  err("%s", buf);
   return 0;
 }
 
 int header_value_cb(http_parser *p, const char *buf, size_t len) {
-  err("%s", buf);
   return 0;
 }
 
 int body_cb(http_parser *p, const char *buf, size_t len) {
-  err("%s", buf);
   return 0;
 }
 
-int count_body_cb(http_parser *p, const char *buf, size_t len)
-{
-  err("%s", buf);
+int count_body_cb(http_parser *p, const char *buf, size_t len) {
   return 0;
 }
 
 int message_begin_cb(http_parser *p) {
-  err("mb");
   return 0;
 }
 
 int headers_complete_cb(http_parser *p) {
-  err("mc");
   return 0;
 }
 
 int message_complete_cb (http_parser *p) {
-  err("mc");
   return 0;
 }
 
@@ -55,13 +55,15 @@ static http_parser_settings settings = {
   .on_message_complete = message_complete_cb
 };
 
-void init_http_request(HTTPRequest *request) {
-  request->parser = malloc(sizeof(http_parser));
-  http_parser_init(request->parser, HTTP_REQUEST);
+void init_http_request() {
+  request.parser = malloc(sizeof(http_parser));
+  http_parser_init(request.parser, HTTP_REQUEST);
 }
 
-void parse_http_request(HTTPRequest *request, char* raw_request_buf, int received) {
-  int parsed = http_parser_execute(request->parser, &settings, raw_request_buf, received);
+void parse_http_request(char* raw_request_buf, int received) {
+  debug("parsing start");
+  int parsed = http_parser_execute(request.parser, &settings, raw_request_buf, received);
+  debug("parsing complete. parsed:%d", parsed);
   if (parsed != received) {
     die("http response cannot be parsed");
   }
