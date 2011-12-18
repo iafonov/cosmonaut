@@ -3,18 +3,21 @@ CFLAGS=-g -Wall
 
 all: cosmonaut
 
-cosmonaut: base_request_handler.o global_config.o networking.o signals.o cli.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o
+cosmonaut: base_request_handler.o global_config.o networking.o signals.o cli.o string_util.o http_request.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o
 
 # make dep
 base_request_handler.o: base_request_handler.c base_request_handler.h \
-  log.h
-cli.o: cli.c cli.h global_config.h
+  http_request.h log.h
+cli.o: cli.c cli.h global_config.h log.h
 cosmonaut.o: cosmonaut.c log.h signals.h networking.h \
   base_request_handler.h global_config.h cli.h
 global_config.o: global_config.c log.h global_config.h \
   ../deps/iniparser/iniparser.h ../deps/iniparser/dictionary.h
+http_request.o: http_request.c http_request.h \
+  ../deps/http_parser/http_parser.h string_util.h log.h
 networking.o: networking.c networking.h global_config.h log.h
 signals.o: signals.c log.h
+string_util.o: string_util.c string_util.h
 
 install: all
 	install -d $(DESTDIR)/$(PREFIX)/bin/

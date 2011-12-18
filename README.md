@@ -21,7 +21,19 @@ Fast multithreaded web server written in C. Just for fun.
 * Close socket
 * Do clean-up
 
-## Interesting things
+## HTTP
+
+### Parsing
+
+Super gotcha - be very careful with callbacks, if you mess with them parser behavior could be really weird.
+
+* HTTP parser used in Node.js (based on nginx implementation): https://github.com/joyent/http-parser
+
+### File upload
+* HTTP file upload rfc: http://www.ietf.org/rfc/rfc1867.txt
+* HTTP file upload rfc explained: http://www.vivtek.com/rfc1867.html
+
+## Interesting implemenatation details
 
 ### Project structure
 
@@ -71,6 +83,14 @@ http://www.delorie.com/gnu/docs/glibc/libc_496.html
 `accept` - gets connection from queue and returns new socket file descriptor for it.
 
 * http://linux.die.net/man/2/accept
+
+### C99 structures in-place initialization
+
+    static http_parser_settings settings = {
+      .on_message_begin = message_begin_cb,
+      .on_header_field = header_field_cb,
+      .on_message_complete = message_complete_cb
+    };
 
 ### Cool trick to eliminate useless variables
 
