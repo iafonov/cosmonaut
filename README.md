@@ -6,9 +6,20 @@ Fast multithreaded web server written in C. Just for fun.
 
 ### Lifecycle
 
+#### Start
+* Parse CLI options
+* Parse config file
+
 #### Bind to port
-#### Accept request & fork
-#### Do clean-up
+#### Accept request
+#### Fork
+* Validate request
+* Determine request type
+* Process request
+
+#### Catch TERM/INT signal & shutdown
+* Close socket
+* Do clean-up
 
 ## Interesting things
 
