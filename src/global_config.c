@@ -16,6 +16,7 @@ void load_configuration(struct GlobalConfig *global_config) {
   dictionary *d = iniparser_load(global_config->config_path);
 
   global_config->server_port = get_str_val(d, "network:port", "31337");
+  global_config->public_root = get_str_val(d, "app:public_root", ".");
   global_config->socket_queue_size = iniparser_getint(d, "network:socket_queue_size", 50);
 
   iniparser_freedict(d);

@@ -4,6 +4,7 @@
 struct GlobalConfig {
   char* config_path;
   char* server_port;
+  char* public_root;
   int socket_queue_size;
 };
 
