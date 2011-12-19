@@ -1,9 +1,9 @@
 PREFIX?=/usr/local
 CFLAGS=-g -Wall
 
-all: cosmonaut
+all: deps cosmonaut
 
-cosmonaut: base_request_handler.o global_config.o networking.o signals.o cli.o string_util.o http_request.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o
+cosmonaut: ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o base_request_handler.o global_config.o networking.o signals.o cli.o string_util.o http_request.o
 
 # make dep
 base_request_handler.o: base_request_handler.c base_request_handler.h \
@@ -19,11 +19,15 @@ networking.o: networking.c networking.h global_config.h log.h
 signals.o: signals.c log.h
 string_util.o: string_util.c string_util.h
 
+deps:
+	cd ../deps && make
+
 install: all
 	install -d $(DESTDIR)/$(PREFIX)/bin/
 	install cosmonaut $(DESTDIR)/$(PREFIX)/bin/
 
 clean:
+	cd ../deps && make clean
 	rm -f *.o
 	rm -f cosmonaut
 	rm -rf *.dSYM
