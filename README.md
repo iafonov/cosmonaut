@@ -23,6 +23,8 @@ Fast multithreaded web server written in C. Just for fun.
 
 # Build & run
 
+Supported platforms: Ubuntu 10.04 (`build-essentials` is required), Mac OS X 10.6, 10.7 (XCode or gcc required).
+
 1. Clone project
 2. Cross your fingers
 3. Run `make` it should build application with its dependencies
