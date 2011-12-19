@@ -6,31 +6,53 @@
 
 #include "networking.h"
 #include "global_config.h"
+#include "string_util.h"
 #include "log.h"
+
+#define HOSTNAME_MAX_LEN 1024
 
 extern sig_atomic_t server_socket_fd;
 extern struct GlobalConfig global_config;
 
-void reset_hints(struct addrinfo *hints) {
+void reset_hints(struct addrinfo *hints, int ai_flags) {
   memset(hints, 0, sizeof *hints);
   hints->ai_family   = AF_UNSPEC;      // v4/v6
   hints->ai_socktype = SOCK_STREAM;    // TCP stream sockets
-  hints->ai_flags    = AI_PASSIVE;     // fill in my IP for me
+  hints->ai_flags    = ai_flags;     // fill in my IP for me
 }
 
 void *get_in_addr(struct sockaddr *sa) {
   return &(((struct sockaddr_in*)sa)->sin_addr);
 }
 
-int bind_server_socket_fd(char* port) {
+char *determine_server_hostname() {
+  struct addrinfo hints, *info;
+
+  char *hostname = malloc_str(HOSTNAME_MAX_LEN);
+  char *canon_hostname = malloc(HOSTNAME_MAX_LEN);
+  gethostname(hostname, HOSTNAME_MAX_LEN);
+
+  reset_hints(&hints, AI_CANONNAME);
+
+  if (getaddrinfo(hostname, "http", &hints, &info) != 0) {
+    die("cannot determine hostname")
+  }
+
+  strncpy(canon_hostname, info->ai_canonname, strlen(info->ai_canonname));
+
+  free(hostname);
+  return canon_hostname;
+}
+
+int bind_server_socket_fd() {
   int status;
   struct sockaddr_storage;
   struct addrinfo hints;
   struct addrinfo *servinfo;
 
-  reset_hints(&hints);
+  reset_hints(&hints, AI_PASSIVE);
 
-  if ((status = getaddrinfo(NULL, port, &hints, &servinfo)) != 0) {
+  if ((status = getaddrinfo(NULL, global_config.server_port, &hints, &servinfo)) != 0) {
     die(gai_strerror(status));
   }
 
@@ -44,7 +66,7 @@ int bind_server_socket_fd(char* port) {
     die(gai_strerror(status));
   }
 
-  info("starting on port %s", port);
+  info("started cosmonaut on %s:%s", global_config.server_name, global_config.server_port);
 
   // clean up
   freeaddrinfo(servinfo);

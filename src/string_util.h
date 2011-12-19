@@ -3,5 +3,6 @@
 
 int str_starts_with(char *str, char *substr);
 int str_pos(char *str, char *chr);
+char* malloc_str(size_t len);
 
 #endif

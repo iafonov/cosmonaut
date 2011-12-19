@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
   load_configuration(&global_config, argc, argv);
 
-  server_socket_fd = bind_server_socket_fd(global_config.server_port);
+  server_socket_fd = bind_server_socket_fd();
   setup_signal_listeners(server_socket_fd);
 
   while(1) {

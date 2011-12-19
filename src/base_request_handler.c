@@ -5,6 +5,7 @@
 #include "base_request_handler.h"
 #include "http_request.h"
 #include "log.h"
+#include "../deps/url_parser/url.h"
 
 extern int server_socket_fd;
 
@@ -36,6 +37,11 @@ void handle_request(int socket_fd) {
   if (received < 0) {
     die("something went completely wrong while receiving data");
   }
+
+
+  // struct parsed_url* url;
+  // url = parse_url("http://yandex.com/index.html?qwe");
+  // err("%s", url->path);
 
   parse_http_request(request_buffer, received);
 

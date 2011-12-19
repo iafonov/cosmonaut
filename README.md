@@ -9,6 +9,8 @@ Fast multithreaded web server written in C. Just for fun.
 * Parse config file
 
 ### Bind to port
+* Determine hostname
+
 ### Accept request
 ### Fork
 * Validate request
