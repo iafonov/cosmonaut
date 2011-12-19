@@ -1,5 +1,6 @@
 #include "log.h"
 #include "global_config.h"
+#include "cli.h"
 #include "../deps/iniparser/iniparser.h"
 
 char* get_str_val(dictionary *d, char *prop_name, char *default_value) {
@@ -11,7 +12,9 @@ char* get_str_val(dictionary *d, char *prop_name, char *default_value) {
   return config_str_ptr;
 }
 
-void load_configuration(struct GlobalConfig *global_config) {
+void load_configuration(struct GlobalConfig *global_config, int argc, char *argv[]) {
+  parse_cli_params(global_config, argc, argv);
+
   info("loading config from %s", global_config->config_path);
   dictionary *d = iniparser_load(global_config->config_path);
 

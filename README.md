@@ -23,7 +23,7 @@ Fast multithreaded web server written in C. Just for fun.
 
 1. Clone project
 2. Cross your fingers
-3. Run `make` it should build both the application and its dependencies
+3. Run `make` it should build application with its dependencies
 4. Run `./src/cosmonaut`
 
 # HTTP

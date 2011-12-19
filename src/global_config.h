@@ -8,6 +8,6 @@ struct GlobalConfig {
   int socket_queue_size;
 };
 
-void load_configuration(struct GlobalConfig *global_config);
+void load_configuration(struct GlobalConfig *global_config, int argc, char *argv[]);
 
 #endif
