@@ -65,7 +65,7 @@ parse_url(const char *url)
     tmpstr = strchr(curstr, ':');
     if ( NULL == tmpstr ) {
         /* Not found the character */
-        parsed_url_free(purl);
+        free_parsed_url(purl);
         return NULL;
     }
     /* Get the scheme length */
@@ -74,14 +74,14 @@ parse_url(const char *url)
     for ( i = 0; i < len; i++ ) {
         if ( !_is_scheme_char(curstr[i]) ) {
             /* Invalid format */
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
     }
     /* Copy the scheme to the storage */
     purl->scheme = malloc(sizeof(char) * (len + 1));
     if ( NULL == purl->scheme ) {
-        parsed_url_free(purl);
+        free_parsed_url(purl);
         return NULL;
     }
     (void)strncpy(purl->scheme, curstr, len);
@@ -101,7 +101,7 @@ parse_url(const char *url)
     /* Eat "//" */
     for ( i = 0; i < 2; i++ ) {
         if ( '/' != *curstr ) {
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
         curstr++;
@@ -133,7 +133,7 @@ parse_url(const char *url)
         len = tmpstr - curstr;
         purl->username = malloc(sizeof(char) * (len + 1));
         if ( NULL == purl->username ) {
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
         (void)strncpy(purl->username, curstr, len);
@@ -151,7 +151,7 @@ parse_url(const char *url)
             len = tmpstr - curstr;
             purl->password = malloc(sizeof(char) * (len + 1));
             if ( NULL == purl->password ) {
-                parsed_url_free(purl);
+                free_parsed_url(purl);
                 return NULL;
             }
             (void)strncpy(purl->password, curstr, len);
@@ -160,7 +160,7 @@ parse_url(const char *url)
         }
         /* Skip '@' */
         if ( '@' != *curstr ) {
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
         curstr++;
@@ -187,7 +187,7 @@ parse_url(const char *url)
     len = tmpstr - curstr;
     purl->host = malloc(sizeof(char) * (len + 1));
     if ( NULL == purl->host || len <= 0 ) {
-        parsed_url_free(purl);
+        free_parsed_url(purl);
         return NULL;
     }
     (void)strncpy(purl->host, curstr, len);
@@ -205,7 +205,7 @@ parse_url(const char *url)
         len = tmpstr - curstr;
         purl->port = malloc(sizeof(char) * (len + 1));
         if ( NULL == purl->port ) {
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
         (void)strncpy(purl->port, curstr, len);
@@ -220,7 +220,7 @@ parse_url(const char *url)
 
     /* Skip '/' */
     if ( '/' != *curstr ) {
-        parsed_url_free(purl);
+        free_parsed_url(purl);
         return NULL;
     }
     curstr++;
@@ -233,7 +233,7 @@ parse_url(const char *url)
     len = tmpstr - curstr;
     purl->path = malloc(sizeof(char) * (len + 1));
     if ( NULL == purl->path ) {
-        parsed_url_free(purl);
+        free_parsed_url(purl);
         return NULL;
     }
     (void)strncpy(purl->path, curstr, len);
@@ -252,7 +252,7 @@ parse_url(const char *url)
         len = tmpstr - curstr;
         purl->query = malloc(sizeof(char) * (len + 1));
         if ( NULL == purl->query ) {
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
         (void)strncpy(purl->query, curstr, len);
@@ -272,7 +272,7 @@ parse_url(const char *url)
         len = tmpstr - curstr;
         purl->fragment = malloc(sizeof(char) * (len + 1));
         if ( NULL == purl->fragment ) {
-            parsed_url_free(purl);
+            free_parsed_url(purl);
             return NULL;
         }
         (void)strncpy(purl->fragment, curstr, len);
@@ -287,7 +287,7 @@ parse_url(const char *url)
  * Free memory of parsed url
  */
 void
-parsed_url_free(struct parsed_url *purl)
+free_parsed_url(struct parsed_url *purl)
 {
     if ( NULL != purl ) {
         if ( NULL != purl->scheme ) {
