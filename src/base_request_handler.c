@@ -5,6 +5,8 @@
 #include "base_request_handler.h"
 #include "http_request.h"
 #include "http_response.h"
+#include "routing_engine.h"
+#include "base_acition.h"
 #include "log.h"
 
 extern int server_socket_fd;
@@ -48,8 +50,14 @@ void handle_request(int socket_fd) {
 
   parse_http_request(request_buffer, received);
 
-
-  send_response(socket_fd);
+  action matched_action = match_route(request);
+  // holy place
+  if (matched_action) {
+    matched_action(request, response);
+    send_response(socket_fd);
+  } else {
+    info("TODO: render 404");
+  }
 
   free_http_response();
   free_http_request();
