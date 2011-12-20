@@ -83,10 +83,12 @@ void free_http_request() {
 }
 
 void parse_http_request(char* raw_request_buf, int received) {
-  debug("parsing start");
   int parsed = http_parser_execute(request->parser, &settings, raw_request_buf, received);
-  debug("parsing complete. parsed:%d", parsed);
   if (parsed != received) {
-    die("http response cannot be parsed");
+    die("malformed http request");
   }
+
+  info("method: %s", http_method_str(request->parser->method));
+  info("full-url: [%s]", request->raw_url);
+  info("request-path: [%s]", request->url->path);
 }

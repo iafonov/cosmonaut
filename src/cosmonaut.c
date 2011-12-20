@@ -22,7 +22,10 @@ int main(int argc, char *argv[]) {
     new_connection_fd = accept_connection();
 
     if (!fork()) {
+      close(server_socket_fd);
+
       handle_request(new_connection_fd);
+
       free_configuration();
       exit(0);
     }

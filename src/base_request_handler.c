@@ -4,6 +4,7 @@
 
 #include "base_request_handler.h"
 #include "http_request.h"
+#include "http_response.h"
 #include "log.h"
 
 extern int server_socket_fd;
@@ -23,41 +24,34 @@ void send_405(int socket_fd) {
   }
 }
 
+void send_response(int socket_fd) {
+  char* serialized_response = serialize_http_response();
+
+  info("Sending:\n%s", serialized_response);
+
+  if (send(socket_fd, serialized_response, strlen(serialized_response), 0) == -1) {
+    err("can not send data to");
+  }
+}
+
 // we are in a new fresh forked process
 void handle_request(int socket_fd) {
   char request_buffer[MAX_DATA_SIZE];
   int received = 0;
 
-  close(server_socket_fd);
-
   init_http_request();
+  init_http_response();
 
-  received = recv(socket_fd, &request_buffer, MAX_DATA_SIZE, 0);
-  if (received < 0) {
+  if ((received = recv(socket_fd, &request_buffer, MAX_DATA_SIZE, 0)) < 0) {
     die("something went completely wrong while receiving data");
   }
 
   parse_http_request(request_buffer, received);
 
-  info("full-url: [%s]", request->raw_url);
-  info("request-path: [%s]", request->url->path);
 
-  send_405(socket_fd);
+  send_response(socket_fd);
 
-  // switch (request.method) {
-  //   case GET:
-  //     info("got GET request");
-  //     break;
-  //   case POST:
-  //     info("got POST request");
-  //     break;
-  //   case HEAD:
-  //     info("got HEAD request");
-  //     break;
-  //   default:
-  //     send_405(socket_fd);
-  // }
-
+  free_http_response();
   free_http_request();
   close(socket_fd);
 }
