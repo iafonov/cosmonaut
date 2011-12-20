@@ -1,8 +1,8 @@
 #ifndef _cli_h
 #define _cli_h
 
-#include "global_config.h"
+#include "configuration.h"
 
-void parse_cli_params(struct GlobalConfig *global_config, int argc, char *argv[]);
+void parse_cli_params(int argc, char *argv[]);
 
 #endif

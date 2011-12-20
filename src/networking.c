@@ -6,14 +6,14 @@
 #include <signal.h>
 
 #include "networking.h"
-#include "global_config.h"
+#include "configuration.h"
 #include "string_util.h"
 #include "log.h"
 
 #define HOSTNAME_MAX_LEN 1024
 
 extern sig_atomic_t server_socket_fd;
-extern struct GlobalConfig global_config;
+extern struct GlobalConfig* configuration;
 
 void reset_hints(struct addrinfo *hints, int ai_flags) {
   memset(hints, 0, sizeof *hints);
@@ -53,7 +53,7 @@ int bind_server_socket_fd() {
 
   reset_hints(&hints, AI_PASSIVE);
 
-  if ((status = getaddrinfo(NULL, global_config.server_port, &hints, &servinfo)) != 0) {
+  if ((status = getaddrinfo(NULL, configuration->server_port, &hints, &servinfo)) != 0) {
     die(gai_strerror(status));
   }
 
@@ -63,11 +63,11 @@ int bind_server_socket_fd() {
     die(gai_strerror(status));
   }
 
-  if ((status = listen(server_socket_fd, global_config.socket_queue_size)) != 0) {
+  if ((status = listen(server_socket_fd, configuration->socket_queue_size)) != 0) {
     die(gai_strerror(status));
   }
 
-  info("started cosmonaut on %s:%s", global_config.server_name, global_config.server_port);
+  info("started cosmonaut on %s:%s", configuration->server_name, configuration->server_port);
 
   // clean up
   freeaddrinfo(servinfo);

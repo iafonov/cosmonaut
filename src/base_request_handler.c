@@ -60,5 +60,4 @@ void handle_request(int socket_fd) {
 
   free_http_request();
   close(socket_fd);
-  exit(0);
 }
