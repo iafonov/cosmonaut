@@ -4,7 +4,7 @@
 #include "networking.h"
 #include "../deps/iniparser/iniparser.h"
 
-extern struct GlobalConfig* configuration;
+extern struct global_config* configuration;
 
 char* get_str_val(dictionary *d, char *prop_name, char *default_value) {
   char *value = iniparser_getstring(d, prop_name, default_value);
@@ -16,7 +16,7 @@ char* get_str_val(dictionary *d, char *prop_name, char *default_value) {
 }
 
 void load_configuration(int argc, char *argv[]) {
-  configuration = malloc(sizeof(GlobalConfig));
+  configuration = malloc(sizeof(global_config));
   parse_cli_params(argc, argv);
 
   info("loading config from %s", configuration->config_path);

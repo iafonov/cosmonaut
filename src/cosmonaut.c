@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-struct GlobalConfig* configuration;
+struct global_config* configuration;
 sig_atomic_t server_socket_fd;
 
 #include "log.h"

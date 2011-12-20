@@ -3,7 +3,7 @@
 
 #define DEFAULT_CONFIG_FILE "./config/cosmonaut.conf"
 
-extern struct GlobalConfig* configuration;
+extern struct global_config* configuration;
 
 void parse_cli_params(int argc, char *argv[]) {
   // very naive but enough for now

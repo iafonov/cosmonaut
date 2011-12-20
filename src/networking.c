@@ -13,7 +13,7 @@
 #define HOSTNAME_MAX_LEN 1024
 
 extern sig_atomic_t server_socket_fd;
-extern struct GlobalConfig* configuration;
+extern struct global_config* configuration;
 
 void reset_hints(struct addrinfo *hints, int ai_flags) {
   memset(hints, 0, sizeof *hints);
