@@ -13,7 +13,7 @@ char* extract(const char *buf, size_t len) {
 }
 
 int request_url_cb(http_parser *p, const char *buf, size_t len) {
-  request.path = extract(buf, len);
+  request->url = parse_url("http://yandex.com/index.html?qwe");
   return 0;
 }
 
@@ -56,13 +56,20 @@ static http_parser_settings settings = {
 };
 
 void init_http_request() {
-  request.parser = malloc(sizeof(http_parser));
-  http_parser_init(request.parser, HTTP_REQUEST);
+  request = malloc(sizeof(http_request));
+  request->parser = malloc(sizeof(http_parser));
+  http_parser_init(request->parser, HTTP_REQUEST);
+}
+
+void free_http_request() {
+  free(request->parser);
+  free_parsed_url(request->url);
+  free(request);
 }
 
 void parse_http_request(char* raw_request_buf, int received) {
   debug("parsing start");
-  int parsed = http_parser_execute(request.parser, &settings, raw_request_buf, received);
+  int parsed = http_parser_execute(request->parser, &settings, raw_request_buf, received);
   debug("parsing complete. parsed:%d", parsed);
   if (parsed != received) {
     die("http response cannot be parsed");
