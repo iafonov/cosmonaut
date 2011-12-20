@@ -39,8 +39,8 @@ void handle_request(int socket_fd) {
 
   parse_http_request(request_buffer, received);
 
-  debug("request-path: [%s]", request->url->path);
-
+  info("full-url: [%s]", request->raw_url);
+  info("request-path: [%s]", request->url->path);
 
   send_405(socket_fd);
 

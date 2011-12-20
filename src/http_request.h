@@ -6,6 +6,7 @@
 
 typedef struct http_request {
   parsed_url* url;
+  char* raw_url;
 
   http_parser *parser;
 } http_request;

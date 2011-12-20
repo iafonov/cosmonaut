@@ -3,17 +3,31 @@
 #include "http_request.h"
 #include "string_util.h"
 #include "log.h"
+#include "configuration.h"
 
-char* extract(const char *buf, size_t len) {
-  char *field = malloc(len + 1);
-  strncat(field, buf + 1, len);
-  field[len + 1] = '\0';
+extern struct global_config* configuration;
+
+char* extract_from_buffer(const char *buf, size_t len) {
+  char *field = malloc_str(len);
+  strncat(field, buf, len);
 
   return field;
 }
 
+char* construct_url(char *path) {
+  int len = strlen("http://") + strlen(configuration->server_name) + strlen(":") + strlen(configuration->server_port) + strlen(path);
+  char* url = malloc_str(len);
+
+  sprintf(url, "http://%s:%s%s", configuration->server_name, configuration->server_port, path);
+
+  return url;
+}
+
 int request_url_cb(http_parser *p, const char *buf, size_t len) {
-  request->url = parse_url("http://yandex.com/index.html?qwe");
+  char *path = extract_from_buffer(buf, len);
+
+  request->raw_url = construct_url(path);
+  request->url = parse_url(request->raw_url);
   return 0;
 }
 
@@ -63,6 +77,7 @@ void init_http_request() {
 
 void free_http_request() {
   free(request->parser);
+  free(request->raw_url);
   free_parsed_url(request->url);
   free(request);
 }
