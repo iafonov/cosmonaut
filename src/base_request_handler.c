@@ -1,38 +1,48 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <assert.h>
+
+#include <fcntl.h>
+// #include <sys/sendfile.h> ubuntu
+#include <sys/types.h>
+#include <sys/uio.h>
 
 #include "base_request_handler.h"
 #include "http_request.h"
 #include "http_response.h"
 #include "routing_engine.h"
+#include "configuration.h"
+#include "string_util.h"
 #include "base_acition.h"
 #include "log.h"
 
 extern int server_socket_fd;
+extern struct global_config* configuration;
 
-void send_405(int socket_fd) {
-  char* error_405 = "HTTP/1.1 405 Method Not Allowed\n"
-                    "Content-Type: text/plain;\n"
-                    "Content-Length:81\n"
-                    "Server: Cosmonaut/0.0.1\n"
-                    "\n"
-                    "405 Method not allowed. Supported methods are GET, POST and HEAD.\n"
-                    "Cosmonaut/0.0.1\n";
+void send_response(http_response* response, int socket_fd) {
+  char* serialized_headers = serialize_headers(response);
 
-  info("Sending: %s", error_405);
-  if (send(socket_fd, error_405, strlen(error_405), 0) == -1) {
-    err("can not send data to");
+  info("sending headers:\n%s", serialized_headers);
+
+  if (send(socket_fd, serialized_headers, strlen(serialized_headers), 0) == -1) {
+    err("can not send headers");
   }
-}
 
-void send_response(int socket_fd) {
-  char* serialized_response = serialize_http_response();
+  if (response->file_path) {
+    struct stat st;
 
-  info("Sending:\n%s", serialized_response);
+    if (stat(response->file_path, &st) == 0) {
+      int file_fd = open(response->file_path, O_RDONLY);
 
-  if (send(socket_fd, serialized_response, strlen(serialized_response), 0) == -1) {
-    err("can not send data to");
+      // MAC OS X specific shit start
+      off_t offset = 0;
+      off_t len = st.st_size;
+
+      sendfile(file_fd, socket_fd, offset, &len, (void *)0, 0);
+      // MAC OS X specific shit end
+    }
   }
 }
 
@@ -51,13 +61,11 @@ void handle_request(int socket_fd) {
   parse_http_request(request_buffer, received);
 
   action matched_action = match_route(request);
-  // holy place
   if (matched_action) {
     matched_action(request, response);
-    send_response(socket_fd);
-  } else {
-    info("TODO: render 404");
   }
+
+  send_response(response, socket_fd);
 
   free_http_response();
   free_http_request();

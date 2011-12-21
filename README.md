@@ -45,6 +45,13 @@ Super gotcha - be very careful with callbacks, if you mess with them parser beha
 
 # Interesting implemenatation details
 
+## Sendfile HELL
+
+`sendfile` is not a part of POSIX so Mac OS X (like all *BSD systems) has different signature from *nix systems.
+
+* Mac OS X reference: http://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man2/sendfile.2.html
+* Linux: http://kernel.org/doc/man-pages/online/pages/man2/sendfile.2.html
+
 ## Project structure
 
 This is very very very important because the later you realize that your project structure is full of shit the harder it would be to do it in a right way. Use make, don't try to use rake for a C project. It doesn't work. (At least for me it didn't)
