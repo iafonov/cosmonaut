@@ -65,6 +65,9 @@ typedef struct StrMap StrMap;
  */
 typedef void(*sm_enum_func)(const char *key, const char *value, const void *obj);
 
+// Reduce function prototype
+typedef char *(*sm_reduce_func)(const char *key, const char *value);
+
 /*
  * Creates a string map.
  *
@@ -177,6 +180,9 @@ int sm_get_count(const StrMap *map);
  * Return value: 1 if enumeration completed, 0 otherwise.
  */
 int sm_enum(const StrMap *map, sm_enum_func enum_func, const void *obj);
+
+// Reduce
+char* sm_reduce(const StrMap *map, sm_reduce_func reduce_func);
 
 #ifdef __cplusplus
 }

@@ -33,6 +33,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with strmap.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdio.h>
 #include "strmap.h"
 
 typedef struct Pair Pair;
@@ -270,6 +271,43 @@ int sm_get_count(const StrMap *map)
 		i++;
 	}
 	return count;
+}
+
+char* sm_reduce(const StrMap *map, sm_reduce_func reduce_func)
+{
+	unsigned int i, j, n, m;
+	char *acc = 0, *iteration_result;
+	Bucket *bucket;
+	Pair *pair;
+
+	if (map == NULL) {
+		return 0;
+	}
+	if (reduce_func == NULL) {
+		return 0;
+	}
+	bucket = map->buckets;
+	n = map->count;
+	i = 0;
+	while (i < n) {
+		pair = bucket->pairs;
+		m = bucket->count;
+		j = 0;
+		while (j < m) {
+      iteration_result = reduce_func(pair->key, pair->value);
+      if (acc) {
+        acc = realloc(acc, strlen(acc) + strlen(iteration_result));
+        acc = strncat(acc, iteration_result, strlen(iteration_result));
+      } else {
+        acc = iteration_result;
+      }
+			pair++;
+			j++;
+		}
+		bucket++;
+		i++;
+	}
+	return acc;
 }
 
 int sm_enum(const StrMap *map, sm_enum_func enum_func, const void *obj)

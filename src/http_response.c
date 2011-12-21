@@ -3,8 +3,11 @@
 
 #include "http_response.h"
 #include "string_util.h"
+#include "configuration.h"
 #include "log.h"
 #include "../deps/concat/concat.h"
+
+extern struct global_config* configuration;
 
 #define MAX_HEADERS_COUNT 25
 
@@ -19,39 +22,35 @@ void free_http_response() {
 }
 
 char* build_header_header(http_response* response) {
-  char* result = malloc_str(concat_len("HTTP/1.1", " ", malloc(response->code / 100), " ", response->header_summary, NULL));
-  sprintf(result, "HTTP/1.1 %d %s", response->code, response->header_summary);
+  char* result = malloc_str(concat_len("HTTP/1.1", " ", malloc(response->code / 100), " ", response->header_summary, "\n", NULL));
+  sprintf(result, "HTTP/1.1 %d %s\n", response->code, response->header_summary);
+
   return result;
 }
 
-void reduce_headers(const char *name, const char *value, const void *acc) {
-  const char *http_headers = (char *)acc;
+char* reduce_headers(const char *name, const char *value) {
   int len = concat_len(name, ": ", value, "\n", NULL);
+  char* result = malloc_str(len);
 
-  err("%s: %s", name, value);
-  err("acc: %s", http_headers);
+  sprintf(result, "%s: %s\n", name, value);
+
+  return result;
 }
 
 char* serialize_headers(http_response* response) {
   char* http_header = build_header_header(response);
+  char* content_length = create_str_from_int(response->content_length);
 
   sm_put(response->headers, "Content-Type", response->content_type);
   sm_put(response->headers, "Server", "Cosmonaut/0.0.1");
-  sm_put(response->headers, "Content-Length", "31337");
+  sm_put(response->headers, "Content-Length", content_length);
 
-  sm_enum(response->headers, reduce_headers, http_header);
+  char* headers = sm_reduce(response->headers, reduce_headers);
 
-  return http_header;
-}
+  http_header = realloc(http_header, strlen(http_header) + strlen(headers) + 1);
+  char* result = concat(http_header, headers, "\n", NULL);
 
-char* serialize_http_response(http_response* response) {
-  char* buffer = "HTTP/1.1 405 Method Not Allowed\n"
-                 "Content-Type: text/plain;\n"
-                 "Content-Length:81\n"
-                 "Server: Cosmonaut/0.0.1\n"
-                 "\n"
-                 "405 Method not allowed.1Supported methods are GET, POST and HEAD.\n"
-                 "Cosmonaut/0.0.1\n";
+  free(content_length);
 
-  return buffer;
+  return result;
 }

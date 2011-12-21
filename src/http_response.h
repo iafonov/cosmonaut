@@ -8,6 +8,7 @@ typedef struct http_response {
   char* header_summary;
   char* file_path; // relative to public_root
   char* content_type;
+  int content_length;
 
   StrMap *headers;
   char* raw_response;

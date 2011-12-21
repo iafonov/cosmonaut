@@ -3,7 +3,7 @@ CFLAGS=-g -Wall
 
 all: deps cosmonaut
 
-cosmonaut: ../deps/strmap/strmap.o ../deps/concat/concat.o ../deps/url_parser/url.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o routing_engine.o base_action.o http_response.o base_request_handler.o configuration.o networking.o signals.o cli.o string_util.o http_request.o
+cosmonaut: ../deps/strmap/strmap.o ../deps/concat/concat.o ../deps/url_parser/url.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o file_util.o routing_engine.o base_action.o http_response.o base_request_handler.o configuration.o networking.o signals.o cli.o string_util.o http_request.o
 
 # make dep
 base_request_handler.o: base_request_handler.c base_request_handler.h \

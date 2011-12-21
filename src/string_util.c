@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,4 +22,11 @@ int str_pos(char *str, char *chr)
      return p - str;
    }
    return -1;
+}
+
+char* create_str_from_int(int i) {
+  char* result = malloc_str(i / 100);
+  sprintf(result, "%d", i);
+
+  return result;
 }
