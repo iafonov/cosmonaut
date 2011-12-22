@@ -16,6 +16,7 @@
 #include "configuration.h"
 #include "string_util.h"
 #include "base_acition.h"
+#include "platform.h"
 #include "log.h"
 
 extern int server_socket_fd;
@@ -36,12 +37,11 @@ void send_response(http_response* response, int socket_fd) {
     if (stat(response->file_path, &st) == 0) {
       int file_fd = open(response->file_path, O_RDONLY);
 
-      // MAC OS X specific shit start
       off_t offset = 0;
       off_t len = st.st_size;
 
-      sendfile(file_fd, socket_fd, offset, &len, (void *)0, 0);
-      // MAC OS X specific shit end
+      int sent = xsendfile(socket_fd, file_fd, &offset, len);
+      info("sent: %d bytes", sent);
     }
   }
 }
