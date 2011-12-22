@@ -73,7 +73,7 @@ Forget about soft tabs, use only real tabs.
 
 ## Valgrind
 
-  valgrind --tool=memcheck --leak-check=full --show-reachable=yes ./src/cosmonaut
+    valgrind --tool=memcheck --leak-check=full --show-reachable=yes ./src/cosmonaut
 
 ## Fork a process
 
