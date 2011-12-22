@@ -31,6 +31,8 @@ void send_response(http_response* response, int socket_fd) {
     err("can not send headers");
   }
 
+  free(serialized_headers);
+
   if (response->file_path) {
     struct stat st;
 

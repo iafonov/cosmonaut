@@ -41,6 +41,7 @@ char *determine_server_hostname() {
 
   strncpy(canon_hostname, info->ai_canonname, strlen(info->ai_canonname));
 
+  freeaddrinfo(info);
   free(hostname);
   return canon_hostname;
 }

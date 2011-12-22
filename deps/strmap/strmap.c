@@ -296,8 +296,9 @@ char* sm_reduce(const StrMap *map, sm_reduce_func reduce_func)
 		while (j < m) {
       iteration_result = reduce_func(pair->key, pair->value);
       if (acc) {
-        acc = realloc(acc, strlen(acc) + strlen(iteration_result));
+        acc = realloc(acc, 1 + strlen(acc) + strlen(iteration_result));
         acc = strncat(acc, iteration_result, strlen(iteration_result));
+        free(iteration_result);
       } else {
         acc = iteration_result;
       }

@@ -28,6 +28,8 @@ int request_url_cb(http_parser *p, const char *buf, size_t len) {
 
   request->raw_url = construct_url(path);
   request->url = parse_url(request->raw_url);
+
+  free(path);
   return 0;
 }
 

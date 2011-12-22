@@ -6,7 +6,8 @@
 
 char* malloc_str(size_t len) {
   char* ptr = malloc(len + 1);
-  ptr[len + 1] = '\0';
+  memset(ptr, 0, len + 1);
+  ptr[len] = '\0';
 
   return ptr;
 }
@@ -25,7 +26,7 @@ int str_pos(char *str, char *chr)
 }
 
 char* create_str_from_int(int i) {
-  char* result = malloc_str(i / 100);
+  char* result = malloc_str(2 + (i / 100));
   sprintf(result, "%d", i);
 
   return result;

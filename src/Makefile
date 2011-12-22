@@ -39,3 +39,4 @@ clean:
 
 dep:
 	$(CC) -MM *.c -I ../deps/iniparser/
+

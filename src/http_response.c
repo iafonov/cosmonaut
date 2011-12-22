@@ -13,16 +13,24 @@ extern struct global_config* configuration;
 
 void init_http_response() {
   response = malloc(sizeof(http_response));
+
+  response->header_summary = NULL;
+  response->file_path = NULL;
+  response->content_type = NULL;
+  response->raw_response = NULL;
+
   response->headers = sm_new(MAX_HEADERS_COUNT);
 }
 
 void free_http_response() {
+  free(response->file_path);
+
   sm_delete(response->headers);
   free(response);
 }
 
 char* build_header_header(http_response* response) {
-  char* result = malloc_str(concat_len("HTTP/1.1", " ", malloc(response->code / 100), " ", response->header_summary, "\n", NULL));
+  char* result = malloc_str(3 + concat_len("HTTP/1.1 XXX ", response->header_summary, "\n", NULL));
   sprintf(result, "HTTP/1.1 %d %s\n", response->code, response->header_summary);
 
   return result;
@@ -50,6 +58,8 @@ char* serialize_headers(http_response* response) {
   http_header = realloc(http_header, strlen(http_header) + strlen(headers) + 1);
   char* result = concat(http_header, headers, "\n", NULL);
 
+  free(headers);
+  free(http_header);
   free(content_length);
 
   return result;

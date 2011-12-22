@@ -34,6 +34,5 @@ int main(int argc, char *argv[]) {
     close(new_connection_fd);
   }
 
-  free_configuration();
   return 0;
 }
