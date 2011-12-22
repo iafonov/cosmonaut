@@ -28,6 +28,8 @@ void load_configuration(int argc, char *argv[]) {
   configuration->public_root = get_str_val(d, "app:public_root", ".");
   configuration->socket_queue_size = iniparser_getint(d, "network:socket_queue_size", 50);
 
+  configuration->routes = routes_map_init();
+
   free(server_hostname);
   iniparser_freedict(d);
 }
@@ -36,6 +38,12 @@ void free_configuration() {
   free(configuration->server_port);
   free(configuration->server_name);
   free(configuration->public_root);
-  
+
+  routes_map_free(configuration->routes);
+
   free(configuration);
+}
+
+void route(char* path, action action_cb) {
+  routes_map_add(configuration->routes, path, action_cb);
 }

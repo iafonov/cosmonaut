@@ -3,6 +3,7 @@
 #include <sys/wait.h>
 
 #include "signal.h"
+#include "configuration.h"
 #include "log.h"
 
 extern int server_socket_fd;

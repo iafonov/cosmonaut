@@ -71,6 +71,10 @@ Gathering dependency info.
 
 Forget about soft tabs, use only real tabs.
 
+## Valgrind
+
+  valgrind --tool=memcheck --leak-check=full --show-reachable=yes ./src/cosmonaut
+
 ## Fork a process
 
 Fork returns new process pid into new process and 0 to parent process thus everything inside `if` block would be executed in a new process. Don't forget to call `exit(0)` to prevent accidental fall-through.

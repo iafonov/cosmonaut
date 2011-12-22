@@ -10,11 +10,18 @@ sig_atomic_t server_socket_fd;
 #include "networking.h"
 #include "base_request_handler.h"
 #include "configuration.h"
+#include "action.h"
+
+void action_index(http_request* request, http_response *response) {
+  info("placeholder");
+}
 
 int main(int argc, char *argv[]) {
   int new_connection_fd;
 
   load_configuration(argc, argv);
+
+  route("/", action_index);
 
   server_socket_fd = bind_server_socket_fd();
   setup_signal_listeners(server_socket_fd);
