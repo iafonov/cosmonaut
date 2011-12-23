@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 struct global_config* configuration;
 sig_atomic_t server_socket_fd;
@@ -36,11 +37,15 @@ int main(int argc, char *argv[]) {
     new_connection_fd = accept_connection();
 
     if (!fork()) {
+      struct timeval* start_time = stopwatch_time();
+
       close(server_socket_fd);
 
       handle_request(new_connection_fd);
 
       free_configuration();
+
+      stopwatch_stop(start_time);
       exit(0);
     }
 

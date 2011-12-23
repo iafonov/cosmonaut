@@ -4,7 +4,7 @@ CFLAGS=-g -Wall -D$(PLATFORM)
 
 all: deps cosmonaut
 
-cosmonaut: ../deps/dict/dict.o ../deps/strmap/strmap.o ../deps/concat/concat.o ../deps/url_parser/url.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o routes_map.o platform.o file_util.o routing_engine.o action.o http_response.o base_request_handler.o configuration.o networking.o signals.o cli.o string_util.o http_request.o
+cosmonaut: ../deps/dict/dict.o ../deps/strmap/strmap.o ../deps/concat/concat.o ../deps/url_parser/url.o ../deps/iniparser/dictionary.o ../deps/iniparser/iniparser.o ../deps/http_parser/http_parser.o log.o routes_map.o platform.o file_util.o routing_engine.o action.o http_response.o base_request_handler.o configuration.o networking.o signals.o cli.o string_util.o http_request.o
 
 # make dep
 base_request_handler.o: base_request_handler.c base_request_handler.h \
