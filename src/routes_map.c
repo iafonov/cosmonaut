@@ -9,11 +9,6 @@ typedef struct route_entry {
   action action_cb;
 } route_entry;
 
-void free_route_entry(route_entry* rt_entry) {
-  free(rt_entry->action_cb);
-  free(rt_entry);
-}
-
 // dict's callbacks
 static unsigned int hash_cb(const void *key) {
   return dictGenHashFunction((unsigned char*)key, strlen((char*)key));
@@ -34,7 +29,7 @@ static void key_destructor_cb(void *privdata, void *key) {
 }
 
 static void val_destructor_cb(void *privdata, void *val) {
-  free_route_entry((route_entry *)val);
+  free(val);
 }
 
 static dictType routes_dict = {
@@ -87,4 +82,5 @@ void routes_map_add(routes_map *rt_map, char *path, action action) {
   rt_entry->action_cb = action;
 
   dictReplace(rt_map, (void *)create_str_from_str(path), (void *)rt_entry);
+  free(rt_entry);
 }
