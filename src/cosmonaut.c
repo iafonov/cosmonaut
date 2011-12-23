@@ -12,8 +12,13 @@ sig_atomic_t server_socket_fd;
 #include "configuration.h"
 #include "action.h"
 
+
 void action_index(http_request* request, http_response *response) {
-  info("placeholder");
+  render_file(response, "index.html");
+}
+
+void action_about(http_request* request, http_response *response) {
+  render_file(response, "about.html");
 }
 
 int main(int argc, char *argv[]) {
@@ -22,6 +27,7 @@ int main(int argc, char *argv[]) {
   load_configuration(argc, argv);
 
   route("/", action_index);
+  route("/about", action_about);
 
   server_socket_fd = bind_server_socket_fd();
   setup_signal_listeners(server_socket_fd);

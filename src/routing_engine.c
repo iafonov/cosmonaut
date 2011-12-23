@@ -16,9 +16,9 @@ action match_route(http_request* request) {
   action matched_action;
 
   if (file_exists(relative_file_path)) {
-    matched_action = render_file;
+    matched_action = action_static_file;
   } else {
-    matched_action = routes_map_get(configuration->routes, "/");
+    matched_action = routes_map_get(configuration->routes, request->url->path);
   }
 
   free(relative_file_path);

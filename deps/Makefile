@@ -4,8 +4,11 @@ default:
 	cd url_parser && make
 	cd concat && make
 	cd strmap && make
+	cd dict && make
 
 clean:
 	cd http_parser && make clean
 	cd iniparser && make clean
 	cd url_parser && make clean
+	cd strmap && make clean
+	cd dict && make clean

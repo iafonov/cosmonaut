@@ -6,9 +6,11 @@
 
 typedef void (*action)(http_request* request, http_response* response);
 
-char* create_local_path_from_request_path(char* request_path);
+char* create_local_path_from_request_path(const char* request_path);
 
-void render_404(http_request* request, http_response *response);
-void render_file(http_request* request, http_response *response);
+void render_file(http_response *response, const char *path);
+
+void action_404(http_request* request, http_response *response);
+void action_static_file(http_request* request, http_response *response);
 
 #endif

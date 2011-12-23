@@ -14,10 +14,8 @@ int xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
 #elif DARWIN
   // int sendfile(int fd, int s, off_t offset, off_t *len, struct sf_hdtr *hdtr, int flags);
   off_t len = count;
-  int result = sendfile(in_fd, out_fd, *offset, &len, (void *)0, 0);
-  if (!result) {
-    err("sendfile failed error: %d", errno);
-  }
+
+  sendfile(in_fd, out_fd, *offset, &len, (void *)0, 0);
   return len;
 #else
   return 0;

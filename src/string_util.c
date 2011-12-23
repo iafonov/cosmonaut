@@ -31,3 +31,9 @@ char* create_str_from_int(int i) {
 
   return result;
 }
+
+char* create_str_from_str(const char *src) {
+  char* dst = malloc_str(strlen(src));
+  strncpy(dst, src, strlen(src));
+  return dst;
+}
