@@ -1,3 +1,6 @@
+#include <sys/time.h>
+#include <stdlib.h>
+
 #include "log.h"
 
 struct timeval* stopwatch_time() {
@@ -9,12 +12,12 @@ struct timeval* stopwatch_time() {
 
 void stopwatch_stop(struct timeval* start_time) {
   struct timeval* end_time = stopwatch_time();
-  long msec;
+  unsigned long msec;
 
   msec = (end_time->tv_sec - start_time->tv_sec) * 1000;
   msec += (end_time->tv_usec - start_time->tv_usec) / 1000;
 
-  info("request completed in %d ms", msec);
+  info("request completed in %lu ms", msec);
   free(start_time);
   free(end_time);
 }
