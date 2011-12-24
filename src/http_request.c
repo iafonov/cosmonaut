@@ -24,6 +24,7 @@ char* construct_url(char *path) {
 }
 
 int request_url_cb(http_parser *p, const char *buf, size_t len) {
+  http_request* request = (http_request*)p->data;
   char *path = extract_from_buffer(buf, len);
 
   request->raw_url = construct_url(path);
@@ -71,20 +72,23 @@ static http_parser_settings settings = {
   .on_message_complete = message_complete_cb
 };
 
-void init_http_request() {
-  request = malloc(sizeof(http_request));
+http_request* http_request_init() {
+  http_request* request = malloc(sizeof(http_request));
   request->parser = malloc(sizeof(http_parser));
+  request->parser->data = request;
   http_parser_init(request->parser, HTTP_REQUEST);
+
+  return request;
 }
 
-void free_http_request() {
+void http_request_free(http_request* request) {
   free(request->parser);
   free(request->raw_url);
   free_parsed_url(request->url);
   free(request);
 }
 
-void parse_http_request(char* raw_request_buf, int received) {
+void http_request_parse(http_request* request, char* raw_request_buf, int received) {
   int parsed = http_parser_execute(request->parser, &settings, raw_request_buf, received);
   if (parsed != received) {
     die("malformed http request");

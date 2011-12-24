@@ -11,10 +11,8 @@ typedef struct http_request {
   http_parser *parser;
 } http_request;
 
-http_request* request;
-
-void init_http_request();
-void free_http_request();
-void parse_http_request(char* raw_request_buf, int received);
+http_request* http_request_init();
+void http_request_free(http_request* request);
+void http_request_parse(http_request* request, char* raw_request_buf, int received);
 
 #endif

@@ -52,16 +52,14 @@ void send_response(http_response* response, int socket_fd) {
 void handle_request(int socket_fd) {
   char request_buffer[MAX_DATA_SIZE];
   int received = 0;
-  http_response* response;
-
-  init_http_request();
-  response = http_response_init();
+  http_request* request = http_request_init();
+  http_response* response = http_response_init();
 
   if ((received = recv(socket_fd, &request_buffer, MAX_DATA_SIZE, 0)) < 0) {
     die("something went completely wrong while receiving data");
   }
 
-  parse_http_request(request_buffer, received);
+  http_request_parse(request, request_buffer, received);
 
   action matched_action = match_route(request);
   if (matched_action) {
@@ -71,6 +69,6 @@ void handle_request(int socket_fd) {
   send_response(response, socket_fd);
 
   http_response_free(response);
-  free_http_request();
+  http_request_free(request);
   close(socket_fd);
 }
