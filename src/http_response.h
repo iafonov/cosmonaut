@@ -10,16 +10,15 @@ typedef struct http_response {
   char* content_type;
   int content_length;
 
-  headers_map* http_headers;
+  headers_map* headers;
   char* raw_response;
 } http_response;
 
-http_response* response;
+// http_response* response;
 
-void init_http_response();
-void free_http_response();
+http_response* http_response_init();
+void http_response_free(http_response* response);
 
-char* serialize_headers(http_response* response);
-char* serialize_http_response(http_response* response);
+char* http_response_serialize_headers(http_response* response);
 
 #endif

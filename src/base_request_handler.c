@@ -23,7 +23,7 @@ extern int server_socket_fd;
 extern struct global_config* configuration;
 
 void send_response(http_response* response, int socket_fd) {
-  char* serialized_headers = serialize_headers(response);
+  char* serialized_headers = http_response_serialize_headers(response);
 
   info("sending headers:\n%s", serialized_headers);
 
@@ -52,9 +52,10 @@ void send_response(http_response* response, int socket_fd) {
 void handle_request(int socket_fd) {
   char request_buffer[MAX_DATA_SIZE];
   int received = 0;
+  http_response* response;
 
   init_http_request();
-  init_http_response();
+  response = http_response_init();
 
   if ((received = recv(socket_fd, &request_buffer, MAX_DATA_SIZE, 0)) < 0) {
     die("something went completely wrong while receiving data");
@@ -69,7 +70,7 @@ void handle_request(int socket_fd) {
 
   send_response(response, socket_fd);
 
-  free_http_response();
+  http_response_free(response);
   free_http_request();
   close(socket_fd);
 }
