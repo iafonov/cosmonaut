@@ -24,6 +24,7 @@ http_response* http_response_init() {
 
 void http_response_free(http_response* response) {
   free(response->file_path);
+  free(response->content_type);
 
   headers_map_free(response->headers);
   free(response);

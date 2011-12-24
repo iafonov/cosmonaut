@@ -12,8 +12,18 @@ char* malloc_str(size_t len) {
   return ptr;
 }
 
-int str_starts_with(char *str, char *substr) {
+int str_starts_with(const char *str, const char *substr) {
   return strncmp(str, substr, strlen(substr)) == 0;
+}
+
+int str_ends_with(const char *str, const char *substr) {
+  if (!str || !substr) return 0;
+  int string_len = strlen(str);
+  int substr_len = strlen(substr);
+
+  if (substr_len > string_len) return 0;
+
+  return strncmp(str + string_len - substr_len, substr, substr_len) == 0;
 }
 
 int str_pos(char *str, char *chr)
