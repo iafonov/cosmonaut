@@ -25,7 +25,7 @@ static int key_comapre_cb(void *privdata, const void *key1, const void *key2) {
 }
 
 static void key_destructor_cb(void *privdata, void *key) {
-  free((char *)key);
+  free(key);
 }
 
 static void val_destructor_cb(void *privdata, void *val) {
@@ -77,7 +77,6 @@ action routes_map_get(routes_map *rt_map, const char *path) {
 }
 
 void routes_map_add(routes_map *rt_map, char *path, action action) {
-  info("adding [%s] to route map dict", path);
   route_entry* rt_entry = malloc(sizeof(route_entry));
   rt_entry->action_cb = action;
 
