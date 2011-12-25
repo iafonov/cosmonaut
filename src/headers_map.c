@@ -20,10 +20,6 @@ static int key_comapre_cb(void *privdata, const void *key1, const void *key2) {
   return strcmp((char *)key1, (char *)key2) == 0;
 }
 
-static void key_destructor_cb(void *privdata, void *key) {
-  free(key);
-}
-
 static void val_destructor_cb(void *privdata, void *val) {
   free(val);
 }
@@ -33,7 +29,7 @@ static dictType headers_dict = {
   NULL,
   val_dup_cb,
   key_comapre_cb,
-  key_destructor_cb,
+  NULL,
   val_destructor_cb
 };
 // end of dict's callbacks
@@ -52,7 +48,7 @@ char* headers_map_get(headers_map *h_map, const char *name) {
 }
 
 void headers_map_add(headers_map *h_map, char *name, char *value) {
-  dictReplace(h_map, (void *)create_str_from_str(name), (void *)create_str_from_str(value));
+  dictReplace(h_map, name, value);
 }
 
 char* headers_map_serialize(headers_map *h_map, char* http_header) {
@@ -71,10 +67,13 @@ char* headers_map_serialize(headers_map *h_map, char* http_header) {
 
     http_header = realloc(http_header, 1 + strlen(http_header) + strlen(header_line));
     http_header = strncat(http_header, header_line, strlen(header_line));
+
+    free(header_line);
   }
 
-  http_header = realloc(http_header, strlen(http_header) + strlen("\n"));
+  http_header = realloc(http_header, strlen(http_header) + strlen("\n") + 1);
   http_header = strncat(http_header, "\n", strlen("\n"));
 
+  free(dict_iterator);
   return http_header;
 }
