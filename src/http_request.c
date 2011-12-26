@@ -35,10 +35,18 @@ int request_url_cb(http_parser *p, const char *buf, size_t len) {
 }
 
 int header_field_cb(http_parser *p, const char *buf, size_t len) {
+  http_request* request = (http_request*)p->data;
+
+  request->_last_header_name = extract_from_buffer(buf, len);
   return 0;
 }
 
 int header_value_cb(http_parser *p, const char *buf, size_t len) {
+  http_request* request = (http_request*)p->data;
+
+  char *header_value = extract_from_buffer(buf, len);
+  headers_map_add(request->headers, request->_last_header_name, header_value);
+  free(header_value);
   return 0;
 }
 
@@ -78,6 +86,8 @@ http_request* http_request_init() {
   request->parser->data = request;
   http_parser_init(request->parser, HTTP_REQUEST);
 
+  request->headers = headers_map_init();
+
   return request;
 }
 
@@ -85,6 +95,7 @@ void http_request_free(http_request* request) {
   free(request->parser);
   free(request->raw_url);
   free_parsed_url(request->url);
+  headers_map_free(request->headers);
   free(request);
 }
 

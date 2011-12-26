@@ -14,8 +14,6 @@ typedef struct http_response {
   char* raw_response;
 } http_response;
 
-// http_response* response;
-
 http_response* http_response_init();
 void http_response_free(http_response* response);
 
