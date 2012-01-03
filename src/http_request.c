@@ -8,6 +8,7 @@
 #include "configuration.h"
 #include "attrs_map.h"
 #include "multipart_parser.h"
+#include "mpart_body_processor.h"
 
 #define CR '\r'
 #define LF '\n'
@@ -19,7 +20,6 @@ static int request_url_cb(http_parser *p, const char *buf, size_t len);
 static int header_field_cb(http_parser *p, const char *buf, size_t len);
 static int header_value_cb(http_parser *p, const char *buf, size_t len);
 static int body_cb(http_parser *p, const char *buf, size_t len);
-static int multipart_body_cb(http_parser *p, const char *buf, size_t len);
 static int headers_complete_cb(http_parser *p);
 
 static http_parser_settings settings = {
@@ -41,19 +41,6 @@ static char* extract_from_buffer(const char *buf, size_t len) {
   strncat(field, buf, len);
 
   return field;
-}
-
-static char* parse_multipart_boundary(http_request *request) {
-  char *content_type = headers_map_get(request->headers, "Content-Type");
-  char *boundary = NULL;
-
-  attrs_map *map = attrs_map_init();
-
-  attrs_map_parse(map, content_type + strlen("multipart/form-data;"));
-  boundary = strdup(strcat(strdup("--"), attrs_map_get(map, "boundary")));
-
-  attrs_map_free(map);
-  return boundary;
 }
 
 static char* construct_url(char *path) {
@@ -97,23 +84,18 @@ static int headers_complete_cb(http_parser *p) {
   http_request* request = (http_request*)p->data;
 
   if (is_multipart(request)) {
-    char *boundary = parse_multipart_boundary(request);
-    request->body_parser = init_multipart_parser(boundary);
-    request->body_parser->data = request;
-    settings.on_body = multipart_body_cb;
-    free(boundary);
+    request->body_processor = mpart_body_processor_init(request);
+    request->free_body_parser_func = (free_body_parser)mpart_body_processor_free;
+
+    settings.on_body = mpart_body_process;
   }
 
   return 0;
 }
 
 static int body_cb(http_parser *p, const char *buf, size_t len) {
-  info("unimplemented body parser");
+  info("generic dummy body parser");
   return 0;
-}
-
-static int multipart_body_cb(http_parser *p, const char *buf, size_t len) {
-  return multipart_parser_execute(((http_request*)p->data)->body_parser, buf, len);
 }
 
 http_request* http_request_init() {
@@ -128,6 +110,8 @@ http_request* http_request_init() {
 }
 
 void http_request_free(http_request* request) {
+  request->free_body_parser_func(request->body_processor);
+
   free(request->parser);
   free(request->raw_url);
   free_parsed_url(request->url);

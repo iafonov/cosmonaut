@@ -1,6 +1,8 @@
 #ifndef _multipart_parser_h
 #define _multipart_parser_h
 
+#include <sys/types.h>
+
 typedef struct multipart_parser {
   void* data;
   int index;

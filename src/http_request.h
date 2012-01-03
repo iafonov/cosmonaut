@@ -8,9 +8,10 @@
 #include "../deps/http_parser/http_parser.h"
 #include "../deps/url_parser/url.h"
 #include "headers_map.h"
-#include "multipart_parser.h"
 
 typedef struct http_request http_request;
+
+typedef void (*free_body_parser) (void*);
 
 struct http_request {
   parsed_url* url;
@@ -18,9 +19,11 @@ struct http_request {
   headers_map* headers;
 
   http_parser *parser;
-  multipart_parser *body_parser;
 
-  // state vairables used during parsing
+  void* body_processor;
+  free_body_parser free_body_parser_func;
+
+  // state vairable used during parsing
   char* _last_header_name;
 };
 
