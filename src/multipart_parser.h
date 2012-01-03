@@ -12,6 +12,7 @@ struct multipart_parser {
   unsigned char state;
   multipart_parser_settings* settings;
 
+  int _boundary_length;
   int _flags;
   char* _lookbehind;
   char* _multipart_boundary;

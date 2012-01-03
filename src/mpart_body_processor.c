@@ -47,7 +47,7 @@ static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
 
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
   char* value = copy_chunk_from_buffer(buf, len);
-  info("part_data_cb = [%s]", value);
+  info("part_data_cb");
   free(value);
 
   return 0;
@@ -100,5 +100,6 @@ int mpart_body_process(http_parser *p, const char *buf, size_t len) {
   http_request* request = (http_request*)p->data;
   mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
 
-  return multipart_parser_execute(processor->parser, buf, len);
+  multipart_parser_execute(processor->parser, buf, len);
+  return 0;
 }

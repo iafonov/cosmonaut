@@ -125,7 +125,6 @@ void http_request_parse(http_request* request, int socket_fd) {
 
   while ((received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
     http_parser_execute(request->parser, &settings, request_buffer, received);
-
     if (received < DATA_CHUNK_SIZE) break;
   }
 }
