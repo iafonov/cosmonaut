@@ -7,6 +7,10 @@
 typedef struct mpart_body_processor {
   http_request* request;
   multipart_parser* parser;
+
+  // headers of current part - don't try to use it outside callbacks it's reset on every part
+  headers_map* part_headers;
+  char* _last_header_name;
 } mpart_body_processor;
 
 mpart_body_processor* mpart_body_processor_init(http_request* request);

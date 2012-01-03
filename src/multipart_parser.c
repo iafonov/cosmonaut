@@ -107,6 +107,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
             return i;
           }
           p->index = 0;
+          NOTIFY_CB(part_data_begin);
           p->state = s_header_field_start;
           break;
         }
@@ -181,7 +182,6 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         // log("s_part_data_start");
         mark = i;
         p->state = s_part_data;
-        NOTIFY_CB(part_data_begin);
       case s_part_data:
         prevIndex = p->index;
 

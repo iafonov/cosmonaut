@@ -6,6 +6,9 @@
 typedef struct multipart_parser_settings multipart_parser_settings;
 typedef struct multipart_parser multipart_parser;
 
+typedef int (*multipart_data_cb) (multipart_parser*, const char *at, size_t length);
+typedef int (*multipart_notify_cb) (multipart_parser*);
+
 struct multipart_parser {
   void* data;
   int index;
@@ -17,9 +20,6 @@ struct multipart_parser {
   char* _lookbehind;
   char* _multipart_boundary;
 };
-
-typedef int (*multipart_data_cb) (multipart_parser*, const char *at, size_t length);
-typedef int (*multipart_notify_cb) (multipart_parser*);
 
 struct multipart_parser_settings {
   multipart_data_cb on_header_field;

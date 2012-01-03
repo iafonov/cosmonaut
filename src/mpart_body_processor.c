@@ -30,36 +30,51 @@ static char* copy_chunk_from_buffer(const char *buf, size_t len) {
 }
 
 static int header_field_cb(multipart_parser* p, const char *buf, size_t len) {
-  char* value = copy_chunk_from_buffer(buf, len);
-  info("header_field_cb = [%s]", value);
-  free(value);
+  http_request* request = (http_request*)p->data;
+  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+
+  processor->_last_header_name = copy_chunk_from_buffer(buf, len);
 
   return 0;
 }
 
 static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
-  char* value = copy_chunk_from_buffer(buf, len);
-  info("header_value_cb = [%s]", value);
-  free(value);
+  http_request* request = (http_request*)p->data;
+  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+
+  char *header_value = copy_chunk_from_buffer(buf, len);
+  headers_map_add(processor->part_headers, strdup(processor->_last_header_name), header_value);
+  free(processor->_last_header_name);
+  free(header_value);
 
   return 0;
 }
 
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
-  char* value = copy_chunk_from_buffer(buf, len);
+  http_request* request = (http_request*)p->data;
+  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+
   info("part_data_cb");
-  free(value);
+  info("HEADER: %s", headers_map_get(processor->part_headers, "Content-Disposition"));
 
   return 0;
 }
 
 static int part_data_begin_cb(multipart_parser* p) {
+  http_request* request = (http_request*)p->data;
+  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+
   info("--part_data_begin_cb");
+  processor->part_headers = headers_map_init();
   return 0;
 }
 
 static int part_data_end_cb(multipart_parser* p) {
+  http_request* request = (http_request*)p->data;
+  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+
   info("--part_data_end_cb");
+  headers_map_free(processor->part_headers);
   return 0;
 }
 
