@@ -12,6 +12,25 @@
 #define log(M, ...)
 #endif
 
+#define NOTIFY_CB(FOR)                                               \
+do {                                                                 \
+  if (p->settings->on_##FOR) {                                       \
+    if (p->settings->on_##FOR(p) != 0) {                             \
+      return i;                                                      \
+    }                                                                \
+  }                                                                  \
+} while (0)
+
+#define DATA_CB(FOR)                                                 \
+do {                                                                 \
+  if (p->settings->on_##FOR) {                                       \
+    if (p->settings->on_##FOR(p, (buf + mark), (i - mark)) != 0) {   \
+      return i;                                                      \
+    }                                                                \
+  }                                                                  \
+} while (0)
+
+
 #define LF 10
 #define CR 13
 #define SPACE 32
@@ -42,58 +61,22 @@ enum parser_flags {
 };
 
 // public api
-multipart_parser* init_multipart_parser(char *boundary) {
+multipart_parser* init_multipart_parser(char *boundary, multipart_parser_settings* settings) {
   multipart_parser* p = malloc(sizeof(multipart_parser));
   p->index = 0;
   p->state = s_start;
+  p->settings = settings;
+
   p->_multipart_boundary = strdup(boundary);
   p->_flags = 0;
   p->_lookbehind = NULL;
   return p;
 }
 
-#include "string_util.h"
-char* copy_chunk_from_buffer(const char *buf, size_t len) {
-  char *field = malloc_str(len);
-  strncat(field, buf, len);
-
-  return field;
-}
-
 void free_multipart_parser(multipart_parser* p) {
   free(p->_multipart_boundary);
   free(p->_lookbehind);
   free(p);
-}
-
-static void header_field_cb(multipart_parser* p, const char *buf, size_t len) {
-  char* value = copy_chunk_from_buffer(buf, len);
-  log("header_field_cb = [%s]", value);
-  free(value);
-}
-
-static void header_value_cb(multipart_parser* p, const char *buf, size_t len) {
-  char* value = copy_chunk_from_buffer(buf, len);
-  log("header_value_cb = [%s]", value);
-  free(value);
-}
-
-static void part_data_cb(multipart_parser* p, const char *buf, size_t len) {
-  char* value = copy_chunk_from_buffer(buf, len);
-  log("part_data_cb = [%s]", value);
-  free(value);
-}
-
-static void part_data_begin_cb(multipart_parser* p) {
-  log("--part_data_begin_cb");
-}
-
-static void part_data_end_cb(multipart_parser* p) {
-  log("--part_data_end_cb");
-}
-
-static void body_end_cb(multipart_parser* p) {
-  log("--body_end_cb");
 }
 
 int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
@@ -153,7 +136,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         }
 
         if (c == COLON) {
-          header_field_cb(p, (buf + mark), (i - mark));
+          DATA_CB(header_field);
           p->state = s_header_value_start;
           break;
         }
@@ -182,7 +165,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
       case s_header_value:
         // log("s_header_value");
         if (c == CR) {
-          header_value_cb(p, (buf + mark), (i - mark));
+          DATA_CB(header_value);
           p->state = s_header_value_almost_done;
         }
         break;
@@ -214,7 +197,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         if (p->index < boundaryLength) {
           if (p->_multipart_boundary[p->index] == c) {
             if (p->index == 0) {
-              part_data_cb(p, (buf + mark), (i - mark));
+              DATA_CB(part_data);
             }
             p->index++;
           } else {
@@ -237,8 +220,8 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
             if (c == LF) {
               // unset the PART_BOUNDARY flag
               p->_flags &= ~f_part_boundary;
-              part_data_end_cb(p);
-              part_data_begin_cb(p);
+              NOTIFY_CB(part_data_end);
+              NOTIFY_CB(part_data_begin);
               p->state = s_header_field_start;
               break;
             }
@@ -260,8 +243,8 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         } else if (p->index - boundaryLength == 3)  {
           p->index = 0;
           if (c == LF) {
-            part_data_end_cb(p);
-            body_end_cb(p);
+            NOTIFY_CB(part_data_end);
+            NOTIFY_CB(body_end);
             p->state = s_end;
             break;
           }
@@ -274,19 +257,18 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         } else if (prevIndex > 0) {
           // if our boundary turned out to be rubbish, the captured lookbehind
           // belongs to partData
-          part_data_cb(p, p->_lookbehind, prevIndex);
+          p->settings->on_part_data(p, p->_lookbehind, prevIndex);
           prevIndex = 0;
           mark = i;
         }
         break;
       case s_end:
-        log("s_end");
         break;
       default:
         log("Multipart parser unrecoverable error");
-        return 1;
+        return 0;
     }
   }
 
-  return 0;
+  return i;
 }
