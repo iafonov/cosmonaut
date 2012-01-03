@@ -44,21 +44,19 @@ void send_response(http_response* response, int socket_fd) {
       int sent = xsendfile(socket_fd, file_fd, &offset, len);
       info("sent: %d bytes", sent);
     }
+  } else if (response->raw_response) {
+    if (send(socket_fd, response->raw_response, strlen(response->raw_response), 0) == -1) {
+      err("can not send headers");
+    }
   }
 }
 
 // we are in a new fresh forked process
 void handle_request(int socket_fd) {
-  char request_buffer[MAX_DATA_SIZE];
-  int received = 0;
   http_request* request = http_request_init();
   http_response* response = http_response_init();
 
-  if ((received = recv(socket_fd, &request_buffer, MAX_DATA_SIZE, 0)) < 0) {
-    die("something went completely wrong while receiving data");
-  }
-
-  http_request_parse(request, request_buffer, received);
+  http_request_parse(request, socket_fd);
 
   action matched_action = match_route(request);
   if (matched_action) {

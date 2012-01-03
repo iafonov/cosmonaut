@@ -45,7 +45,7 @@ static char* create_normalized_path(const char *path) {
   char *result;
 
   if (path[0] == '/') {
-    return create_str_from_str(path);
+    return strdup(path);
   } else {
     result = malloc_str(strlen(path) + 1);
     sprintf(result, "/%s", path);
@@ -80,6 +80,6 @@ void routes_map_add(routes_map *rt_map, char *path, action action) {
   route_entry* rt_entry = malloc(sizeof(route_entry));
   rt_entry->action_cb = action;
 
-  dictReplace(rt_map, (void *)create_str_from_str(path), (void *)rt_entry);
+  dictReplace(rt_map, (void *)strdup(path), (void *)rt_entry);
   free(rt_entry);
 }

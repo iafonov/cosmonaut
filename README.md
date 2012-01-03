@@ -40,6 +40,7 @@ Super gotcha - be very careful with callbacks, if you mess with them parser beha
 * HTTP parser used in Node.js (based on nginx implementation): https://github.com/joyent/http-parser
 
 ## File upload
+* HTTP Multipart form data rfc: http://www.ietf.org/rfc/rfc2388.txt
 * HTTP file upload rfc: http://www.ietf.org/rfc/rfc1867.txt
 * HTTP file upload rfc explained: http://www.vivtek.com/rfc1867.html
 

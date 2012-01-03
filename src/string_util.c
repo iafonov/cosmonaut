@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "string_util.h"
 
@@ -42,8 +43,24 @@ char* create_str_from_int(int i) {
   return result;
 }
 
-char* create_str_from_str(const char *src) {
-  char* dst = malloc_str(strlen(src));
-  strncpy(dst, src, strlen(src));
-  return dst;
+char *str_trim(char *str)
+{
+  char *end;
+
+  while(isspace(*str)) str++;
+
+  if (*str == 0) return str;
+
+  end = str + strlen(str) - 1;
+  while(end > str && isspace(*end)) end--;
+
+  *(end + 1) = 0;
+
+  return str;
+}
+
+void skip_spaces(char **ptr) {
+  while (isspace(**ptr)) {
+    *ptr = *ptr + 1;
+  }
 }

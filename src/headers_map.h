@@ -1,9 +1,9 @@
 #ifndef _headers_map_h
 #define _headers_map_h
 
-#include "../deps/dict/dict.h"
+#include "str_map.h"
 
-typedef dict headers_map;
+typedef str_map headers_map;
 
 headers_map* headers_map_init();
 void headers_map_free(headers_map* h_map);
