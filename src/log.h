@@ -13,7 +13,7 @@ void stopwatch_stop(struct timeval* end_time);
 
 #ifdef NDEBUG
 #define debug(M, ...)
-#else 
+#else
 #define debug(M, ...) fprintf(stderr, "[DEBUG][%d] %s:%d: " M "\n", getpid(), __FILE__, __LINE__, ##__VA_ARGS__)
 #endif
 

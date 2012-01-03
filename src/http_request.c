@@ -87,8 +87,8 @@ static int header_value_cb(http_parser *p, const char *buf, size_t len) {
   http_request* request = (http_request*)p->data;
 
   char *header_value = extract_from_buffer(buf, len);
-  headers_map_add(request->headers, request->_last_header_name, header_value);
-  // free(request->_last_header_name);
+  headers_map_add(request->headers, strdup(request->_last_header_name), header_value);
+  free(request->_last_header_name);
   free(header_value);
   return 0;
 }
