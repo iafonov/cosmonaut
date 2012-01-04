@@ -9,7 +9,7 @@ extern struct global_config* configuration;
 #define MAP_CONTENT_TYPE(path, ext, content_type) if (str_ends_with(path, ext)) return strdup(content_type);
 
 static char* content_type_by_path(const char *path) {
-  MAP_CONTENT_TYPE(path, "html", "text/html");
+  MAP_CONTENT_TYPE(path, "html", "text/html; charset=UTF-8");
   MAP_CONTENT_TYPE(path, "css",  "text/css");
   MAP_CONTENT_TYPE(path, "js",   "application/javascript");
   MAP_CONTENT_TYPE(path, "jpg",  "image/jpg");

@@ -22,12 +22,11 @@ void attrs_map_add(attrs_map *map, char *name, char *value) {
   str_map_add(map, name, value);
 }
 
-void attrs_map_parse(attrs_map *map, char* header_str) {
-  char *pair, *name, *value;
+void attrs_map_parse(attrs_map *map, char* str) {
+  char *pair, *name, *value, *header_str;
+  header_str = strdup(str);
 
   while(isspace(*header_str)) header_str++;
-
-  header_str = strdup(header_str);
 
   while((pair = strsep(&header_str, ";")) && pair != NULL) {
     name = strsep(&pair, "=");
