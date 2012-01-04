@@ -105,12 +105,15 @@ http_request* http_request_init() {
   http_parser_init(request->parser, HTTP_REQUEST);
 
   request->headers = headers_map_init();
+  request->free_body_parser_func = NULL;
 
   return request;
 }
 
 void http_request_free(http_request* request) {
-  request->free_body_parser_func(request->body_processor);
+  if (request->free_body_parser_func != NULL) {
+    request->free_body_parser_func(request->body_processor);
+  }
 
   free(request->parser);
   free(request->raw_url);
