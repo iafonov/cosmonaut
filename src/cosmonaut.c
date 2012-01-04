@@ -18,14 +18,6 @@ void action_index(http_request* request, http_response *response) {
   render_file(response, "index.html");
 }
 
-void action_about(http_request* request, http_response *response) {
-  render_file(response, "about.html");
-}
-
-void action_echo(http_request* request, http_response *response) {
-  render_text(response, request->url->query);
-}
-
 void action_upload(http_request* request, http_response *response) {
   render_text(response, "Uploaded!");
 }
@@ -36,8 +28,6 @@ int main(int argc, char *argv[]) {
   load_configuration(argc, argv);
 
   route("/", action_index);
-  route("/about", action_about);
-  route("/echo", action_echo);
   route("/upload_file", action_upload);
 
   server_socket_fd = bind_server_socket_fd();

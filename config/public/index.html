@@ -1,12 +1,74 @@
-<html>
-  <title>Cosmonaut 0.0.1 - It works</title>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cosmonaut</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style type="text/css">
+      body { padding-top: 10px; }
+      .hero-unit { padding-left: 10px; }
+    </style>
+  </head>
+
   <body>
-    <h1>It is fucking incredible that you can see it.</h1>
-    <a href="/about">About</a>
-    <a href="/upload.html">Upload</a>
-    <a href="/form.html">Simple Form</a>
-    <a href="/echo?name1=value1&name2=value2">Echo</a>
-    <hr />
-    <a href="https://github.com/iafonov/cosmonaut"><i>Cosmonaut 0.0.1</i></a>
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">Cosmonaut 0.0.1</a>
+          <ul class="nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#upload-file">Upload file</a></li>
+            <li><a href="https://github.com/iafonov/cosmonaut">List files</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="hero-unit row">
+        <div class="span2">
+          <img src="cosmonaut.png" />
+        </div>
+
+        <div class="span8">
+          <h1>It Works!</h1>
+          <p>Fast &amp; simple custom built web-server</p>  
+        </div>
+      </div>
+
+      <section id="upload-file">
+        <div class="page-header">
+          <h1>Upload file <small>size is limited to 20 megabytes</small></h1>
+        </div>
+        <div class="row">
+          <form action="upload_file" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <div class="clearfix">
+                <label for="file">File:</label>
+                <div class="input">
+                  <input class="input-file" id="fileInput" name="file" type="file" />
+                </div>
+              </div>
+              <div class="clearfix">
+                <label for="textarea">Description</label>
+                <div class="input">
+                  <textarea class="xxlarge" id="description" name="description" rows="4"></textarea>
+                  <span class="help-block">
+                    You can input some text to describe uploaded file
+                  </span>
+                </div>
+              </div>
+              <div class="actions">
+                <input type="submit" class="btn primary" value="Upload">
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </section>
+
+      <footer>
+        <p>&copy; <a href="http://iafonov.github.com/">Igor Afonov</a> / <a href="https://github.com/iafonov/cosmonaut">GitHub</a></p>
+      </footer>
+    </div>
   </body>
 </html>
