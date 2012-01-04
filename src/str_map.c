@@ -11,9 +11,11 @@ static unsigned int hash_cb(const void *key) {
 }
 
 static void *val_dup_cb(void *privdata, const void *src) {
-  char *dup = malloc_str(strlen((char *)src));
-  strncpy(dup, src, strlen((char *)src));
-  return dup;
+  return strdup((char *)src);
+}
+
+static void *key_dup_cb(void *privdata, const void *src) {
+  return strdup((char *)src);
 }
 
 static int key_comapre_cb(void *privdata, const void *key1, const void *key2) {
@@ -24,12 +26,16 @@ static void val_destructor_cb(void *privdata, void *val) {
   free(val);
 }
 
+static void key_destructor_cb(void *privdata, void *key) {
+  free(key);
+}
+
 static dictType str_dict = {
   hash_cb,
-  NULL,
+  key_dup_cb,
   val_dup_cb,
   key_comapre_cb,
-  NULL,
+  key_destructor_cb,
   val_destructor_cb
 };
 

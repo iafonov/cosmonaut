@@ -45,7 +45,7 @@ static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
   mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
 
   char *header_value = copy_chunk_from_buffer(buf, len);
-  headers_map_add(processor->part_headers, strdup(processor->_last_header_name), header_value);
+  headers_map_add(processor->part_headers, processor->_last_header_name, header_value);
   free(processor->_last_header_name);
   free(header_value);
 
