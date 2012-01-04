@@ -106,7 +106,6 @@ static char* get_boundary(http_request *request) {
   memcpy(boundary, "--", strlen("--"));
   memcpy(boundary + strlen("--"), attrs_map_get(map, "boundary"), strlen(attrs_map_get(map, "boundary")) + 1);
 
-  free(content_type);
   attrs_map_free(map);
   return boundary;
 }

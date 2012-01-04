@@ -23,8 +23,9 @@ void attrs_map_add(attrs_map *map, char *name, char *value) {
 }
 
 void attrs_map_parse(attrs_map *map, char* str) {
-  char *pair, *name, *value, *header_str;
+  char *pair, *name, *value, *header_str, *original_ptr;
   header_str = strdup(str);
+  original_ptr = header_str;
 
   while(isspace(*header_str)) header_str++;
 
@@ -35,5 +36,5 @@ void attrs_map_parse(attrs_map *map, char* str) {
     attrs_map_add(map, str_trim(name), str_trim(value));
   }
 
-  free(header_str);
+  free(original_ptr);
 }
