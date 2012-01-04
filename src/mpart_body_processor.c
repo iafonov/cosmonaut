@@ -101,10 +101,11 @@ static char* get_boundary(http_request *request) {
 
   attrs_map_parse(map, content_type + strlen("multipart/form-data;"));
 
+
   boundary = malloc(strlen("--") + strlen(attrs_map_get(map, "boundary")) + 1);
 
-  strcat(boundary, "--");
-  strcat(boundary, attrs_map_get(map, "boundary"));
+  memcpy(boundary, "--", strlen("--"));
+  memcpy(boundary + strlen("--"), attrs_map_get(map, "boundary"), strlen(attrs_map_get(map, "boundary")) + 1);
 
   attrs_map_free(map);
   return boundary;
@@ -113,10 +114,12 @@ static char* get_boundary(http_request *request) {
 // public api
 mpart_body_processor* mpart_body_processor_init(http_request* request) {
   mpart_body_processor* processor = malloc(sizeof(mpart_body_processor));
+  char *boundary = get_boundary(request);
 
-  processor->parser = init_multipart_parser(get_boundary(request), &settings);
+  processor->parser = init_multipart_parser(boundary, &settings);
   processor->parser->data = request;
 
+  free(boundary);
   return processor;
 }
 
