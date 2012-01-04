@@ -101,12 +101,12 @@ static char* get_boundary(http_request *request) {
 
   attrs_map_parse(map, content_type + strlen("multipart/form-data;"));
 
-
   boundary = malloc(strlen("--") + strlen(attrs_map_get(map, "boundary")) + 1);
 
   memcpy(boundary, "--", strlen("--"));
   memcpy(boundary + strlen("--"), attrs_map_get(map, "boundary"), strlen(attrs_map_get(map, "boundary")) + 1);
 
+  free(content_type);
   attrs_map_free(map);
   return boundary;
 }
