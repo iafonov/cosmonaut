@@ -10,6 +10,7 @@ static int header_field_cb(multipart_parser* p, const char *buf, size_t len);
 static int header_value_cb(multipart_parser* p, const char *buf, size_t len);
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len);
 static int part_data_begin_cb(multipart_parser* p);
+static int headers_complete_cb(multipart_parser* p);
 static int part_data_end_cb(multipart_parser* p);
 static int body_end_cb(multipart_parser* p);
 
@@ -18,6 +19,7 @@ static multipart_parser_settings settings = {
   .on_header_value = header_value_cb,
   .on_part_data = part_data_cb,
   .on_part_data_begin = part_data_begin_cb,
+  .on_headers_complete = headers_complete_cb,
   .on_part_data_end = part_data_end_cb,
   .on_body_end = body_end_cb
 };
@@ -50,12 +52,20 @@ static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
   return 0;
 }
 
+static int headers_complete_cb(multipart_parser* p) {
+  http_request* request = (http_request*)p->data;
+  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+
+  info("HEADER: %s", headers_map_get(processor->part_headers, "Content-Disposition"));
+
+  return 0;
+}
+
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
   http_request* request = (http_request*)p->data;
   mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
 
   info("part_data_cb");
-  info("HEADER: %s", headers_map_get(processor->part_headers, "Content-Disposition"));
 
   return 0;
 }

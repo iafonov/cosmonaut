@@ -180,6 +180,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         break;
       case s_part_data_start:
         // log("s_part_data_start");
+        NOTIFY_CB(headers_complete);
         mark = i;
         p->state = s_part_data;
       case s_part_data:
