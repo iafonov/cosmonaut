@@ -100,7 +100,11 @@ static char* get_boundary(http_request *request) {
   attrs_map *map = attrs_map_init();
 
   attrs_map_parse(map, content_type + strlen("multipart/form-data;"));
-  boundary = strdup(strcat(strdup("--"), attrs_map_get(map, "boundary")));
+
+  boundary = malloc(strlen("--") + strlen(attrs_map_get(map, "boundary")) + 1);
+
+  strcat(boundary, "--");
+  strcat(boundary, attrs_map_get(map, "boundary"));
 
   attrs_map_free(map);
   return boundary;
