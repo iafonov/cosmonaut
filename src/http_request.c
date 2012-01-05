@@ -105,6 +105,8 @@ http_request* http_request_init() {
   http_parser_init(request->parser, HTTP_REQUEST);
 
   request->headers = headers_map_init();
+  request->params = params_map_init();
+
   request->free_body_parser_func = NULL;
 
   return request;
@@ -119,6 +121,7 @@ void http_request_free(http_request* request) {
   free(request->raw_url);
   free_parsed_url(request->url);
   headers_map_free(request->headers);
+  params_map_free(request->params);
   free(request);
 }
 

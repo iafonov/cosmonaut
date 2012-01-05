@@ -8,21 +8,23 @@
 #include "../deps/http_parser/http_parser.h"
 #include "../deps/url_parser/url.h"
 #include "headers_map.h"
+#include "params_map.h"
 
 typedef struct http_request http_request;
 
 typedef void (*free_body_parser) (void*);
 
 struct http_request {
+  // public api
   parsed_url* url;
   char* raw_url;
   headers_map* headers;
+  params_map* params;
 
+  // private stuff
   http_parser *parser;
-
   void* body_processor;
   free_body_parser free_body_parser_func;
-
   // state vairable used during parsing
   char* _last_header_name;
 };

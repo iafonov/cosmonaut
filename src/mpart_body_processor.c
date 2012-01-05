@@ -56,8 +56,19 @@ static int headers_complete_cb(multipart_parser* p) {
   http_request* request = (http_request*)p->data;
   mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
 
-  info("HEADER: %s", headers_map_get(processor->part_headers, "Content-Disposition"));
+  char* content_disposition = headers_map_get(processor->part_headers, "Content-Disposition");
+  attrs_map* cd_attrs_map = attrs_map_init();
 
+  if (str_starts_with(content_disposition, "form-data;")) {
+    attrs_map_parse(cd_attrs_map, content_disposition + strlen("form-data;"));
+
+    char* name = attrs_map_get(cd_attrs_map, "name");
+    char* filename = attrs_map_get(cd_attrs_map, "filename");
+
+    processor->_current_param = param_entry_reinit(processor->_current_param, name, NULL, (filename != NULL));
+  }
+
+  attrs_map_free(cd_attrs_map);
   return 0;
 }
 
@@ -65,7 +76,7 @@ static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
   http_request* request = (http_request*)p->data;
   mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
 
-  info("part_data_cb");
+  processor->_current_param->val = str_concat(processor->_current_param->val, copy_chunk_from_buffer(buf, len));
 
   return 0;
 }
@@ -83,7 +94,9 @@ static int part_data_end_cb(multipart_parser* p) {
   http_request* request = (http_request*)p->data;
   mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
 
-  info("--part_data_end_cb");
+  params_map_add(request->params, processor->_current_param);
+
+  param_entry_free(processor->_current_param);
   headers_map_free(processor->part_headers);
   return 0;
 }
@@ -101,10 +114,7 @@ static char* get_boundary(http_request *request) {
 
   attrs_map_parse(map, content_type + strlen("multipart/form-data;"));
 
-  boundary = malloc(strlen("--") + strlen(attrs_map_get(map, "boundary")) + 1);
-
-  memcpy(boundary, "--", strlen("--"));
-  memcpy(boundary + strlen("--"), attrs_map_get(map, "boundary"), strlen(attrs_map_get(map, "boundary")) + 1);
+  boundary = str_concat("--", attrs_map_get(map, "boundary"));
 
   attrs_map_free(map);
   return boundary;
@@ -117,6 +127,7 @@ mpart_body_processor* mpart_body_processor_init(http_request* request) {
 
   processor->parser = init_multipart_parser(boundary, &settings);
   processor->parser->data = request;
+  processor->_current_param = NULL;
 
   free(boundary);
   return processor;

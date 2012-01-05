@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "string_util.h"
 
@@ -43,8 +44,7 @@ char* create_str_from_int(int i) {
   return result;
 }
 
-char *str_trim(char *str)
-{
+char *str_trim(char *str) {
   char *end;
 
   while(isspace(*str)) str++;
@@ -59,8 +59,45 @@ char *str_trim(char *str)
   return str;
 }
 
+static bool is_quote(char c) {
+  return (c == '"' || c == '\'');
+}
+
+char *str_strip_quotes(char *str) {
+  char *end;
+
+  while(is_quote(*str)) str++;
+
+  if (*str == 0) return str;
+
+  end = str + strlen(str) - 1;
+  while(end > str && is_quote(*end)) end--;
+
+  *(end + 1) = 0;
+
+  return str;
+}
+
 void skip_spaces(char **ptr) {
   while (isspace(**ptr)) {
     *ptr = *ptr + 1;
   }
+}
+
+char *str_concat(char *str1, char *str2) {
+  if (str1 == NULL) {
+    return strdup(str2);
+  }
+
+  if (str2 == NULL) {
+    return strdup(str1);
+  }
+
+  int len1 = strlen(str1), len2 = strlen(str2);
+  char *result = malloc(strlen(str1) + strlen(str2) + 1);
+
+  memcpy(result, str1, len1);
+  memcpy(result + len1, str2, len2 + 1);
+
+  return result;
 }

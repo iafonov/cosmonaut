@@ -33,7 +33,7 @@ void attrs_map_parse(attrs_map *map, char* str) {
     name = strsep(&pair, "=");
     value = strsep(&pair, "=");
 
-    attrs_map_add(map, str_trim(name), str_trim(value));
+    attrs_map_add(map, str_trim(name), str_trim(str_strip_quotes(value)));
   }
 
   free(original_ptr);

@@ -19,7 +19,7 @@ void action_index(http_request* request, http_response *response) {
 }
 
 void action_upload(http_request* request, http_response *response) {
-  render_text(response, "Uploaded!");
+  render_text(response, params_map_get(request->params, "file")->val);
 }
 
 int main(int argc, char *argv[]) {

@@ -4,7 +4,9 @@
 int str_starts_with(const char *str, const char *substr);
 int str_ends_with(const char *str, const char *substr);
 int str_pos(char *str, char *chr);
+char *str_concat(char *str1, char *str2);
 
+char *str_strip_quotes(char *str);
 char *str_trim(char *str);
 
 void skip_spaces(char **ptr);
