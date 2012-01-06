@@ -2,7 +2,7 @@
 #define _routes_map_h
 
 #include "action.h"
-#include "../deps/dict/dict.h"
+#include "dict.h"
 
 typedef dict routes_map;
 

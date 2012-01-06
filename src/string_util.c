@@ -15,6 +15,7 @@ char* malloc_str(size_t len) {
 }
 
 int str_starts_with(const char *str, const char *substr) {
+  if ((str == NULL) || (substr == NULL)) return 0;
   return strncmp(str, substr, strlen(substr)) == 0;
 }
 
@@ -100,4 +101,8 @@ char *str_concat(char *str1, char *str2) {
   memcpy(result + len1, str2, len2 + 1);
 
   return result;
+}
+
+char* str_safe_dup(char *src) {
+  return (src == NULL) ? NULL : strdup(src);
 }

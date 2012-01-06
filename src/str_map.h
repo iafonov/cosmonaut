@@ -1,7 +1,7 @@
 #ifndef _str_map_h
 #define _str_map_h
 
-#include "../deps/dict/dict.h"
+#include "dict.h"
 
 typedef dict str_map;
 

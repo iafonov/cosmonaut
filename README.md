@@ -1,6 +1,10 @@
 # Learn C the über hard way
 
-Fast multithreaded web server written in C. Just for fun.
+Fast web server/framework written in C. Just for fun.
+
+## API
+
+The server has endpoints that could be used either directly or as an interface to another higher-level frameworks
 
 ## Lifecycle
 

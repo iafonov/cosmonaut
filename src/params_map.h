@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "../deps/dict/dict.h"
+#include "dict.h"
 
 typedef dict params_map;
 

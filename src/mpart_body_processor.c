@@ -32,8 +32,7 @@ static char* copy_chunk_from_buffer(const char *buf, size_t len) {
 }
 
 static int header_field_cb(multipart_parser* p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+  mpart_body_processor* processor = (mpart_body_processor*)p->data;
 
   processor->_last_header_name = copy_chunk_from_buffer(buf, len);
 
@@ -41,8 +40,7 @@ static int header_field_cb(multipart_parser* p, const char *buf, size_t len) {
 }
 
 static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+  mpart_body_processor* processor = (mpart_body_processor*)p->data;
 
   char *header_value = copy_chunk_from_buffer(buf, len);
   headers_map_add(processor->part_headers, processor->_last_header_name, header_value);
@@ -53,8 +51,7 @@ static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
 }
 
 static int headers_complete_cb(multipart_parser* p) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+  mpart_body_processor* processor = (mpart_body_processor*)p->data;
 
   char* content_disposition = headers_map_get(processor->part_headers, "Content-Disposition");
   attrs_map* cd_attrs_map = attrs_map_init();
@@ -73,8 +70,7 @@ static int headers_complete_cb(multipart_parser* p) {
 }
 
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+  mpart_body_processor* processor = (mpart_body_processor*)p->data;
 
   processor->_current_param->val = str_concat(processor->_current_param->val, copy_chunk_from_buffer(buf, len));
 
@@ -82,8 +78,7 @@ static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
 }
 
 static int part_data_begin_cb(multipart_parser* p) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+  mpart_body_processor* processor = (mpart_body_processor*)p->data;
 
   info("--part_data_begin_cb");
   processor->part_headers = headers_map_init();
@@ -91,8 +86,8 @@ static int part_data_begin_cb(multipart_parser* p) {
 }
 
 static int part_data_end_cb(multipart_parser* p) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
+  mpart_body_processor* processor = (mpart_body_processor*)p->data;
+  http_request* request = (http_request*)processor->request;
 
   params_map_add(request->params, processor->_current_param);
 
@@ -125,8 +120,9 @@ mpart_body_processor* mpart_body_processor_init(http_request* request) {
   mpart_body_processor* processor = malloc(sizeof(mpart_body_processor));
   char *boundary = get_boundary(request);
 
+  processor->request = request;
   processor->parser = init_multipart_parser(boundary, &settings);
-  processor->parser->data = request;
+  processor->parser->data = processor;
   processor->_current_param = NULL;
 
   free(boundary);
@@ -136,12 +132,4 @@ mpart_body_processor* mpart_body_processor_init(http_request* request) {
 void mpart_body_processor_free(mpart_body_processor* processor) {
   free_multipart_parser(processor->parser);
   free(processor);
-}
-
-int mpart_body_process(http_parser *p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->body_processor;
-
-  multipart_parser_execute(processor->parser, buf, len);
-  return 0;
 }
