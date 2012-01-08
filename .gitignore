@@ -1,6 +1,8 @@
 .DS_Store
 .*.swp
 *.o
+*.a
+*.so
 *.rdb
 *.log
 cosmonaut
