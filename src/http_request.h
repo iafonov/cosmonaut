@@ -16,11 +16,13 @@ struct http_request {
 	url* url;
  	headers_map* headers;
   params_map* params;
+	char* uid;
 
 	http_request_state* _s;
 };
 
 http_request* http_request_init();
+char* http_request_uploads_path(http_request* request);
 void http_request_free(http_request* request);
 void http_request_parse(http_request* request, int socket_fd);
 

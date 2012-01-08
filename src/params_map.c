@@ -18,8 +18,9 @@ static void *val_dup_cb(void *privdata, const void *src) {
   const param_entry* src_param = (param_entry *)src;
   param_entry *dup = malloc(sizeof(param_entry));
 
-  dup->name = strdup(src_param->name);
-  dup->val = strdup(src_param->val);
+  dup->name = str_safe_dup(src_param->name);
+  dup->val = str_safe_dup(src_param->val);
+  dup->file = src_param->file;
   dup->is_file = src_param->is_file;
 
   return dup;
@@ -61,6 +62,14 @@ param_entry* param_entry_reinit(param_entry* p, char *name, char *val, bool is_f
 void param_entry_free(param_entry* p) {
   free(p->name);
   free(p->val);
+}
+
+void param_entry_append(param_entry* p, char *data_chunk) {
+  if (p->is_file) {
+    fwrite(data_chunk, sizeof(char), strlen(data_chunk), p->file);
+  } else {
+    p->val = str_concat(p->val, data_chunk);
+  }
 }
 
 // public api

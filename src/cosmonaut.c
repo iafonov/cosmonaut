@@ -19,7 +19,7 @@ void action_index(http_request* request, http_response *response) {
 }
 
 void action_upload(http_request* request, http_response *response) {
-  render_text(response, params_map_get(request->params, "file")->val);
+  render_text(response, params_map_get(request->params, "description")->val);
 }
 
 void configure() {
@@ -41,6 +41,7 @@ void cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
     new_connection_fd = accept_connection();
 
     if (!fork()) {
+      srand(getpid());
       struct timeval* start_time = stopwatch_time();
 
       close(server_socket_fd);

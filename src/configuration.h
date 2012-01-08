@@ -9,6 +9,7 @@ typedef struct global_config {
   char* server_name;
 
   char* public_root;
+  char* uploads_root;
   int socket_queue_size;
 
   routes_map* routes;

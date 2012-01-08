@@ -106,3 +106,17 @@ char *str_concat(char *str1, char *str2) {
 char* str_safe_dup(char *src) {
   return (src == NULL) ? NULL : strdup(src);
 }
+
+#include "log.h"
+char* str_random(int len) {
+  static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  char *s = malloc(len);
+  int i = 0;
+
+  for (i = 0; i < len; ++i) {
+    s[i] = alphabet[rand() % (sizeof(alphabet) - 1)];
+  }
+
+  s[len] = 0;
+  return s;
+}

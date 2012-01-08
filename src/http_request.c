@@ -110,7 +110,7 @@ static int headers_complete_cb(http_parser *p) {
 }
 
 static int body_cb(http_parser *p, const char *buf, size_t len) {
-  info("generic dummy body parser");
+  // generic body parser prototype
   return 0;
 }
 
@@ -119,9 +119,9 @@ http_request* http_request_init() {
 
   request->headers = headers_map_init();
   request->params = params_map_init();
+  request->uid = str_random(20);
+
   request->_s = malloc(sizeof(http_request_state));
-
-
   request->_s->free_body_parser_func = NULL;
 
   return request;
@@ -135,8 +135,16 @@ void http_request_free(http_request* request) {
   url_free(request->url);
   headers_map_free(request->headers);
   params_map_free(request->params);
+  free(request->uid);
   free(request->_s);
   free(request);
+}
+
+char* http_request_uploads_path(http_request* request) {
+  char* result = malloc_str(strlen(configuration->uploads_root) + strlen("/") + strlen(request->uid));
+  sprintf(result, "%s/%s", configuration->uploads_root, request->uid);
+
+  return result;
 }
 
 void http_request_parse(http_request* request, int socket_fd) {

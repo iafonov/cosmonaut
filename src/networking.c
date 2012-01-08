@@ -85,7 +85,7 @@ int accept_connection() {
   new_fd = accept(server_socket_fd, (struct sockaddr *)&their_addr, &addr_size);
 
   inet_ntop(AF_INET, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
-  info("server: got connection from %s", s);
+  info("serving request from %s", s);
 
   return new_fd;
 }

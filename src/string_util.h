@@ -4,6 +4,7 @@
 int str_starts_with(const char *str, const char *substr);
 int str_ends_with(const char *str, const char *substr);
 int str_pos(char *str, char *chr);
+char* str_random(int len);
 char* str_safe_dup(char *src);
 char *str_concat(char *str1, char *str2);
 

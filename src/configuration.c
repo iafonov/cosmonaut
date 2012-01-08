@@ -19,13 +19,14 @@ void load_configuration(int argc, char *argv[]) {
   configuration = malloc(sizeof(global_config));
   parse_cli_params(argc, argv);
 
-  info("loading config from %s", configuration->config_path);
+  info("loading configuration from %s", configuration->config_path);
   dictionary *d = iniparser_load(configuration->config_path);
   char* server_hostname = determine_server_hostname();
 
   configuration->server_port = get_str_val(d, "network:port", "31337");
   configuration->server_name = get_str_val(d, "network:server_name", server_hostname);
   configuration->public_root = get_str_val(d, "app:public_root", ".");
+  configuration->uploads_root = get_str_val(d, "app:uploads_root", ".");
   configuration->socket_queue_size = iniparser_getint(d, "network:socket_queue_size", 50);
 
   configuration->routes = routes_map_init();
@@ -38,6 +39,7 @@ void free_configuration() {
   free(configuration->server_port);
   free(configuration->server_name);
   free(configuration->public_root);
+  free(configuration->uploads_root);
 
   routes_map_free(configuration->routes);
 

@@ -24,8 +24,6 @@ extern struct global_config* configuration;
 void send_response(http_response* response, int socket_fd) {
   char* serialized_headers = http_response_serialize_headers(response);
 
-  info("sending headers:\n%s", serialized_headers);
-
   if (send(socket_fd, serialized_headers, strlen(serialized_headers), 0) == -1) {
     err("can not send headers");
   }
@@ -41,8 +39,7 @@ void send_response(http_response* response, int socket_fd) {
       off_t offset = 0;
       off_t len = st.st_size;
 
-      int sent = xsendfile(socket_fd, file_fd, &offset, len);
-      info("sent: %d bytes", sent);
+      xsendfile(socket_fd, file_fd, &offset, len);
     }
   } else if (response->raw_response) {
     if (send(socket_fd, response->raw_response, strlen(response->raw_response), 0) == -1) {
