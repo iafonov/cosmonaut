@@ -1,4 +1,5 @@
 config/public/uploads/
+src/libcosmonaut.dylib
 .DS_Store
 .*.swp
 *.o

@@ -29,6 +29,16 @@ do {                                                                 \
   }                                                                  \
 } while (0)
 
+#define EMIT_PART_DATA_CB(FOR)                                       \
+do {                                                                 \
+  if (p->settings->on_##FOR) {                                       \
+    p->_parsed = p->_parsed + (i - mark);                            \
+    if (p->settings->on_##FOR(p, (buf + mark), (i - mark)) != 0) {   \
+      return i;                                                      \
+    }                                                                \
+  }                                                                  \
+} while (0)
+
 
 #define LF 10
 #define CR 13
@@ -70,6 +80,7 @@ multipart_parser* init_multipart_parser(char *boundary, multipart_parser_setting
   p->_boundary_length = strlen(boundary);
   p->_flags = 0;
   p->_lookbehind = NULL;
+  p->_parsed = 0;
   return p;
 }
 
@@ -187,29 +198,18 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         log("s_part_data");
         prevIndex = p->index;
 
-        if (p->index == 0) {
-          while (i + p->_boundary_length <= len) {
-            if (strchr(p->_multipart_boundary, buf[i + p->_boundary_length - 1]) != NULL) {
-              break;
-            }
-
-            i += p->_boundary_length;
-          }
-          c = buf[i];
-        }
-
         if (p->index < p->_boundary_length) {
           if (p->_multipart_boundary[p->index] == c) {
             if (p->index == 0) {
               // very ugly way to omit emitting trailing CR+LF which doesn't belong to file but
               // rather belong to multipart stadard
               int adjustment = 0;
-              if (buf[i - 1] == LF && buf[i - 2] == CR) {
+              if (buf[i - 1] == LF && buf[i - 2] == CR && buf[i + 1] == '-') {
                 adjustment = 2;
               }
 
               i = i - adjustment;
-              EMIT_DATA_CB(part_data);
+              EMIT_PART_DATA_CB(part_data);
               i = i + adjustment;
             }
             p->index++;
@@ -270,14 +270,15 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         } else if (prevIndex > 0) {
           // if our boundary turned out to be rubbish, the captured lookbehind
           // belongs to partData
+          p->_parsed = p->_parsed + prevIndex;
           p->settings->on_part_data(p, p->_lookbehind, prevIndex);
           prevIndex = 0;
           mark = i;
         }
 
-        if (i == len - 1) {
+        if (p->index == 0 && i == len - 1) {
           i++;
-          EMIT_DATA_CB(part_data);
+          EMIT_PART_DATA_CB(part_data);
         }
         break;
       case s_end:

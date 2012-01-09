@@ -86,8 +86,10 @@ static int headers_complete_cb(multipart_parser* p) {
 }
 
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
-  mpart_body_processor* processor = (mpart_body_processor*)p->data;
-  param_entry_append(processor->_current_param, buf, len);
+  if (len != 0) {
+    mpart_body_processor* processor = (mpart_body_processor*)p->data;
+    param_entry_append(processor->_current_param, buf, len);
+  }
   return 0;
 }
 
