@@ -12,7 +12,7 @@ class Cosmonaut
       STDOUT.reopen(File.open(@stdout_filename, "w"))
       STDERR.reopen(File.open(@stderr_filename, "w"))
 
-      exec "./src/cosmonaut #{cli_args}"
+      exec "./features/test_app/test_app #{cli_args}"
     end
 
     sleep 1 while COSMONAUT.std_err.empty?

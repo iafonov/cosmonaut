@@ -16,7 +16,7 @@ typedef struct param_entry {
 } param_entry;
 
 param_entry* param_entry_reinit(param_entry* p, char *name, char *val, bool is_file);
-void param_entry_append(param_entry* p, char *data_chunk);
+void param_entry_append(param_entry* p, const char *buf, size_t len);
 void param_entry_finalize(param_entry* p);
 void param_entry_free(param_entry* p);
 

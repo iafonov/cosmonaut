@@ -87,12 +87,7 @@ static int headers_complete_cb(multipart_parser* p) {
 
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
   mpart_body_processor* processor = (mpart_body_processor*)p->data;
-  char *data_chunk = copy_chunk_from_buffer(buf, len);
-
-  param_entry_append(processor->_current_param, data_chunk);
-
-  free(data_chunk);
-
+  param_entry_append(processor->_current_param, buf, len);
   return 0;
 }
 

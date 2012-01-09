@@ -19,7 +19,7 @@ void action_index(http_request* request, http_response *response) {
 }
 
 void action_upload(http_request* request, http_response *response) {
-  render_text(response, params_map_get(request->params, "description")->val);
+  render_text(response, "UPLOADED");
 }
 
 void configure() {

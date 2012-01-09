@@ -4,8 +4,6 @@
 #include "multipart_parser.h"
 #include "log.h"
 
-#define DEBUG
-
 #ifdef DEBUG
 #include <stdio.h>
 #define log(M, ...) fprintf(stderr, "[HTTP_MULTIPART_PARSER] %s:%d: " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
@@ -90,12 +88,14 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
     char c = buf[i];
     switch (p->state) {
       case s_start:
+        log("s_start");
         p->_lookbehind = malloc(p->_boundary_length + 8 + 1);
 
         p->index = 0;
         p->state = s_start_boundary;
         break;
       case s_start_boundary:
+        log("s_start_boundary");
         if (p->index == strlen(p->_multipart_boundary) - 1) {
           if (c != CR) {
             return i;
@@ -119,11 +119,11 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         p->index++;
         break;
       case s_header_field_start:
-        // log("s_header_field_start");
+        log("s_header_field_start");
         mark = i;
         p->state = s_header_field;
       case s_header_field:
-        // log("s_header_field");
+        log("s_header_field");
         if (c == CR) {
           p->state = s_headers_almost_done;
           break;
@@ -147,7 +147,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         if (i == len - 1) EMIT_DATA_CB(header_field);
         break;
       case s_headers_almost_done:
-        // log("s_headers_almost_done");
+        log("s_headers_almost_done");
         if (c != LF) {
           return i;
         }
@@ -155,7 +155,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         p->state = s_part_data_start;
         break;
       case s_header_value_start:
-        // log("s_header_value_start");
+        log("s_header_value_start");
         if (c == SPACE) {
           break;
         }
@@ -163,7 +163,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         mark = i;
         p->state = s_header_value;
       case s_header_value:
-        // log("s_header_value");
+        log("s_header_value");
         if (c == CR) {
           EMIT_DATA_CB(header_value);
           p->state = s_header_value_almost_done;
@@ -172,18 +172,19 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         if (i == len - 1) EMIT_DATA_CB(header_value);
         break;
       case s_header_value_almost_done:
-        // log("s_header_value_almost_done");
+        log("s_header_value_almost_done");
         if (c != LF) {
           return i;
         }
         p->state = s_header_field_start;
         break;
       case s_part_data_start:
-        // log("s_part_data_start");
+        log("s_part_data_start");
         NOTIFY_CB(headers_complete);
         mark = i;
         p->state = s_part_data;
       case s_part_data:
+        log("s_part_data");
         prevIndex = p->index;
 
         if (p->index == 0) {
@@ -200,7 +201,16 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         if (p->index < p->_boundary_length) {
           if (p->_multipart_boundary[p->index] == c) {
             if (p->index == 0) {
+              // very ugly way to omit emitting trailing CR+LF which doesn't belong to file but
+              // rather belong to multipart stadard
+              int adjustment = 0;
+              if (buf[i - 1] == LF && buf[i - 2] == CR) {
+                adjustment = 2;
+              }
+
+              i = i - adjustment;
               EMIT_DATA_CB(part_data);
+              i = i + adjustment;
             }
             p->index++;
           } else {
@@ -271,6 +281,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         }
         break;
       case s_end:
+        log("s_end");
         break;
       default:
         log("Multipart parser unrecoverable error");

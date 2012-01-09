@@ -1,3 +1,4 @@
+config/public/uploads/
 .DS_Store
 .*.swp
 *.o

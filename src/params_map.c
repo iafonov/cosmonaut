@@ -5,6 +5,13 @@
 #include "string_util.h"
 #include "log.h"
 
+static char* copy_chunk_from_buffer(const char *buf, size_t len) {
+  char *field = malloc_str(len);
+  strncat(field, buf, len);
+
+  return field;
+}
+
 // dict's callbacks
 static unsigned int hash_cb(const void *key) {
   return dictGenHashFunction((unsigned char*)key, strlen((char*)key));
@@ -64,11 +71,13 @@ void param_entry_free(param_entry* p) {
   free(p->val);
 }
 
-void param_entry_append(param_entry* p, char *data_chunk) {
+void param_entry_append(param_entry* p, const char *buf, size_t len) {
   if (p->is_file) {
-    fwrite(data_chunk, sizeof(char), strlen(data_chunk), p->file);
+    fwrite(buf, sizeof(char), len, p->file);
   } else {
+    char *data_chunk = copy_chunk_from_buffer(buf, len);
     p->val = str_concat(p->val, data_chunk);
+    free(data_chunk);
   }
 }
 

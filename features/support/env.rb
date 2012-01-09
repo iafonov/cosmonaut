@@ -12,8 +12,8 @@ Capybara.run_server = false
 
 COSMONAUT = Cosmonaut.new
 COSMONAUT.rebuild
-COSMONAUT.start("--config #{fixture_file_path("test_app.conf")}")
+COSMONAUT.start("--config ./features/test_app/test_app.conf")
 
-After do
+at_exit do
   COSMONAUT.stop
 end
