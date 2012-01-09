@@ -1,3 +1,4 @@
+features/test_app/test_app
 config/public/uploads/
 features/test_app/public/uploads/
 src/libcosmonaut.dylib
