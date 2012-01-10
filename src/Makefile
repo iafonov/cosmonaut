@@ -27,7 +27,7 @@ OBJ = ../deps/concat/concat.o \
 			url.o \
 			dict.o
 
-OPTIMIZATION?=-O3
+OPTIMIZATION?=-O0
 PLATFORM := $(shell sh -c 'uname -s 2>/dev/null | tr 'a-z' 'A-Z'')
 
 ifeq ($(PLATFORM),DARWIN)
@@ -39,7 +39,7 @@ ifeq ($(PLATFORM),DARWIN)
   STLIBNAME?=libcosmonaut.a
   STLIB_MAKE_CMD?=libtool -static -o ${STLIBNAME} - ${OBJ}
 else
-  CFLAGS?=$(OPTIMIZATION) -fPIC -Wall $(ARCH) $(PROF) -D$(PLATFORM)
+  CFLAGS?=$(OPTIMIZATION) -fPIC -Wall -g $(ARCH) $(PROF) -D$(PLATFORM)
   LDFLAGS?=-L. -Wl,-rpath,.
   DYLIBNAME?=libcosmonaut.so
   DYLIB_MAKE_CMD?=gcc -shared -Wl,-soname,${DYLIBNAME} -o ${DYLIBNAME} ${OBJ}

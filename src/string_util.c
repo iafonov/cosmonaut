@@ -110,7 +110,7 @@ char* str_safe_dup(char *src) {
 #include "log.h"
 char* str_random(int len) {
   static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  char *s = malloc(len);
+  char *s = malloc(len + 1);
   int i = 0;
 
   for (i = 0; i < len; ++i) {

@@ -43,6 +43,7 @@ static void key_destructor_cb(void *privdata, void *key) {
 
 static void val_destructor_cb(void *privdata, void *val) {
   free(((param_entry *)val)->val);
+  free(((param_entry *)val)->name);
   free(val);
 }
 
@@ -55,9 +56,7 @@ static dictType params_dict = {
   val_destructor_cb
 };
 
-param_entry* param_entry_reinit(param_entry* p, char *name, char *val, bool is_file) {
-  free(p);
-
+param_entry* param_entry_init(param_entry* p, char *name, char *val, bool is_file) {
   p = malloc(sizeof(param_entry));
   p->name = name == NULL ? NULL : strdup(name);
   p->val = val == NULL ? NULL : strdup(val);
@@ -69,6 +68,8 @@ param_entry* param_entry_reinit(param_entry* p, char *name, char *val, bool is_f
 void param_entry_free(param_entry* p) {
   free(p->name);
   free(p->val);
+
+  free(p);
 }
 
 void param_entry_append(param_entry* p, const char *buf, size_t len) {

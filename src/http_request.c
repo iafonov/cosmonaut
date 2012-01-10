@@ -67,6 +67,7 @@ static int request_url_cb(http_parser *p, const char *buf, size_t len) {
 
   request->url = url_init(request_url);
 
+  free(path);
   free(request_url);
   return 0;
 }

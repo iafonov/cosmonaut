@@ -69,7 +69,7 @@ static int headers_complete_cb(multipart_parser* p) {
     char* filename = attrs_map_get(cd_attrs_map, "filename");
     bool is_file = (filename != NULL);
 
-    processor->_current_param = param_entry_reinit(processor->_current_param, name, NULL, is_file);
+    processor->_current_param = param_entry_init(processor->_current_param, name, NULL, is_file);
 
     if (is_file) {
       char *upload_folder_path = http_request_uploads_path(request);
@@ -78,6 +78,9 @@ static int headers_complete_cb(multipart_parser* p) {
       char *file_path = malloc_str(strlen(upload_folder_path) + strlen("/") + strlen(filename));
       sprintf(file_path, "%s/%s", upload_folder_path, filename);
       processor->_current_param->file = fopen(file_path, "a");
+
+      free(upload_folder_path);
+      free(file_path);
     }
   }
 
