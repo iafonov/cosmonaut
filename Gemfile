@@ -1,3 +1,5 @@
+source :rubygems
+
 gem "ruby-debug"
 gem "mixlib-shellout"
 gem "cucumber"
