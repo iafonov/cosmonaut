@@ -121,6 +121,7 @@ http_request* http_request_init() {
   request->headers = headers_map_init();
   request->params = params_map_init();
   request->uid = str_random(20);
+  request->configuration = configuration;
 
   request->_s = malloc(sizeof(http_request_state));
   request->_s->free_body_parser_func = NULL;

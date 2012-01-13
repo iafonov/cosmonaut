@@ -5,7 +5,6 @@
 #include "string_util.h"
 #include "configuration.h"
 #include "log.h"
-#include "../deps/concat/concat.h"
 
 extern struct global_config* configuration;
 
@@ -32,7 +31,7 @@ void http_response_free(http_response* response) {
 }
 
 char* build_header_header(http_response* response) {
-  char* result = malloc_str(3 + concat_len("HTTP/1.1 XXX ", response->header_summary, "\n", NULL));
+  char* result = malloc_str(3 + strlen("HTTP/1.1 XXX ") + strlen(response->header_summary) + strlen("\n"));
   sprintf(result, "HTTP/1.1 %d %s\n", response->code, response->header_summary);
 
   return result;

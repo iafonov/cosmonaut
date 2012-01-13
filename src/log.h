@@ -21,6 +21,6 @@ void stopwatch_stop(struct timeval* end_time);
 #define warn(M, ...) fprintf(stderr, "[WARN][%d] (%s:%d) " M "\n", getpid(), __FILE__, __LINE__, ##__VA_ARGS__)
 #define info(M, ...) fprintf(stderr, "[INFO][%d] (%s:%d) " M "\n", getpid(), __FILE__, __LINE__, ##__VA_ARGS__)
 
-#define die(M, ...) err(##__VA_ARGS__);exit(1);
+#define die(M, ...)  fprintf(stderr, "[FATAL][%d] (%s:%d) " M "\n", getpid(), __FILE__, __LINE__, ##__VA_ARGS__); exit(1);
 
 #endif

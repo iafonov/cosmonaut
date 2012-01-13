@@ -17,6 +17,7 @@ struct http_request {
  	headers_map* headers;
   params_map* params;
 	char* uid;
+	struct global_config* configuration;
 
 	http_request_state* _s;
 };

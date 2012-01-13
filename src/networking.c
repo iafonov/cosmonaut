@@ -36,7 +36,7 @@ char *determine_server_hostname() {
   reset_hints(&hints, AI_CANONNAME);
 
   if (getaddrinfo(hostname, "http", &hints, &info) != 0) {
-    die("cannot determine hostname")
+    die("cannot determine hostname");
   }
 
   strncpy(canon_hostname, info->ai_canonname, strlen(info->ai_canonname));
@@ -55,17 +55,17 @@ int bind_server_socket_fd() {
   reset_hints(&hints, AI_PASSIVE);
 
   if ((status = getaddrinfo(NULL, configuration->server_port, &hints, &servinfo)) != 0) {
-    die(gai_strerror(status));
+    die("%s", gai_strerror(status));
   }
 
   server_socket_fd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
   if ((status = bind(server_socket_fd, servinfo->ai_addr, servinfo->ai_addrlen)) != 0) {
-    die(gai_strerror(status));
+    die("%s", gai_strerror(status));
   }
 
   if ((status = listen(server_socket_fd, configuration->socket_queue_size)) != 0) {
-    die(gai_strerror(status));
+    die("%s", gai_strerror(status));
   }
 
   info("started cosmonaut on %s:%s", configuration->server_name, configuration->server_port);

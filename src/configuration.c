@@ -4,6 +4,8 @@
 #include "networking.h"
 #include "../deps/iniparser/iniparser.h"
 
+#define URL_NAMED_PARAM_PATTERN "\\(:([^/]*)\\)"
+
 extern struct global_config* configuration;
 
 char* get_str_val(dictionary *d, char *prop_name, char *default_value) {
@@ -29,6 +31,11 @@ void load_configuration(int argc, char *argv[]) {
   configuration->uploads_root = get_str_val(d, "app:uploads_root", ".");
   configuration->socket_queue_size = iniparser_getint(d, "network:socket_queue_size", 50);
 
+  configuration->param_match_regex = malloc(sizeof(regex_t));
+  if (regcomp(configuration->param_match_regex, URL_NAMED_PARAM_PATTERN, REG_EXTENDED) != 0) {
+    die("Invalid route parameter regex format");
+  }
+
   configuration->routes = routes_map_init();
 
   free(server_hostname);
@@ -41,11 +48,12 @@ void free_configuration() {
   free(configuration->public_root);
   free(configuration->uploads_root);
 
+  regfree(configuration->param_match_regex);
   routes_map_free(configuration->routes);
 
   free(configuration);
 }
 
-void route(char* path, action action_cb) {
+void mount(char* path, action action_cb) {
   routes_map_add(configuration->routes, path, action_cb);
 }

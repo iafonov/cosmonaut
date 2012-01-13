@@ -1,5 +1,4 @@
-OBJ = ../deps/concat/concat.o \
-      ../deps/url_parser/url.o \
+OBJ = ../deps/url_parser/url.o \
       ../deps/iniparser/dictionary.o \
       ../deps/iniparser/iniparser.o \
       ../deps/http_parser/http_parser.o \

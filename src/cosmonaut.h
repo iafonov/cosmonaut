@@ -3,9 +3,10 @@
 
 #include "http_request.h"
 #include "http_response.h"
+#include "configuration.h"
 
 typedef void (*configure_app_cb) ();
 
-void cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb);
+int cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb);
 
 #endif

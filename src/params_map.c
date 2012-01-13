@@ -56,8 +56,8 @@ static dictType params_dict = {
   val_destructor_cb
 };
 
-param_entry* param_entry_init(param_entry* p, char *name, char *val, bool is_file) {
-  p = malloc(sizeof(param_entry));
+param_entry* param_entry_init(char *name, char *val, bool is_file) {
+  param_entry* p = malloc(sizeof(param_entry));
   p->name = name == NULL ? NULL : strdup(name);
   p->val = val == NULL ? NULL : strdup(val);
   p->is_file = is_file;
@@ -98,4 +98,33 @@ param_entry* params_map_get(params_map *p_map, const char *name) {
 
 void params_map_add(params_map *p_map, param_entry* param) {
   dictReplace(p_map, param->name, param);
+}
+
+void params_map_add_str(params_map *p_map, char* name, char *value) {
+  params_map_add(p_map, param_entry_init(name, value, false));
+}
+
+char* params_map_serialize(params_map *p_map) {
+  dictIterator* dict_iterator;
+  dictEntry* dict_entry;
+  param_entry* param;
+  char* line, *result = NULL;
+
+  dict_iterator = dictGetIterator(p_map);
+
+  while((dict_entry = dictNext(dict_iterator)) != NULL) {
+    param = (param_entry*)dictGetEntryVal(dict_entry);
+
+    line = malloc_str(strlen("[") + strlen(param->name) + strlen(":") + strlen(param->val) + strlen("]"));
+    sprintf(line, "[%s:%s]", param->name, param->val);
+
+    result = str_concat(result, line);
+
+    free(line);
+  }
+
+  free(dict_iterator);
+
+  if (result == NULL) result = strdup("Params hash is empty");
+  return result;
 }

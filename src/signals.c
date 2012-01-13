@@ -14,7 +14,7 @@ void sigchld_handler(int signal) {
 
 void sigint_handler(int signal) {
   if (setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, (int[]){1}, sizeof(int)) == -1) {
-    die("port unbind failed")
+    die("port unbind failed");
   }
 
   free_configuration();

@@ -14,25 +14,14 @@ sig_atomic_t server_socket_fd;
 #include "action.h"
 #include "cosmonaut.h"
 
-void action_index(http_request* request, http_response *response) {
-  render_file(response, "index.html");
-}
-
-void action_upload(http_request* request, http_response *response) {
-  render_text(response, "UPLOADED");
-}
-
-void configure() {
-  route("/", action_index);
-  route("/upload_file", action_upload);
-}
-
-void cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
+int cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
   int new_connection_fd;
 
   load_configuration(argc, argv);
 
-  config_cb();
+  if (config_cb != NULL) {
+    config_cb();
+  }
 
   server_socket_fd = bind_server_socket_fd();
   setup_signal_listeners(server_socket_fd);
@@ -56,10 +45,10 @@ void cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
 
     close(new_connection_fd);
   }
+
+  return 0;
 }
 
 int main(int argc, char *argv[]) {
-  cosmonaut_start(argc, argv, configure);
-
-  return 0;
+  return cosmonaut_start(argc, argv, NULL);
 }

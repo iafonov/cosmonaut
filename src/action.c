@@ -16,6 +16,7 @@ static char* content_type_by_path(const char *path) {
   MAP_CONTENT_TYPE(path, "png",  "image/png");
   MAP_CONTENT_TYPE(path, "mp3",  "audio/mp3");
   MAP_CONTENT_TYPE(path, "ico",  "image/x-icon");
+  MAP_CONTENT_TYPE(path, "gif",  "image/gif");
 
   return strdup("application/octet-stream");
 }
@@ -46,8 +47,20 @@ void render_text(http_response *response, const char *text) {
   response->raw_response = strdup(text);
 }
 
+void render_json(http_response *response, const char *json_string) {
+  response->code = 200;
+  response->header_summary = "OK";
+  response->file_path = NULL;
+  response->content_length = strlen(json_string);
+  response->content_type = strdup("application/json");
+  response->raw_response = strdup(json_string);
+}
+
 void action_404(http_request* request, http_response *response) {
   render_file(response, "404.html");
+
+  response->code = 404;
+  response->header_summary = "Not Found";
 }
 
 void action_static_file(http_request* request, http_response *response) {
