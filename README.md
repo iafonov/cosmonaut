@@ -35,7 +35,7 @@ Server lifecycle is very simple and straightforward:
 
     #include "cosmonaut.h"
 
-    void action_index(http_request* request, http_response *response) {
+    void action_index(http_request *request, http_response *response) {
       render_text(response, "Hello world");
     }
 
@@ -58,11 +58,11 @@ Action is a simple function that accepts `http_request` and `http_response` stru
 Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid`. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. 
 
     struct http_request {
-      url* url;
-      headers_map* headers;
-      params_map* params;
-      char* uid;
-      struct global_config* configuration;
+      url *url;
+      headers_map *headers;
+      params_map *params;
+      char *uid;
+      struct global_config *configuration;
     };
 
 ## URL
@@ -88,9 +88,9 @@ This structure represents parsed url parts.
 
     typedef struct http_response {
       int code;
-      char* header_summary;
-      char* file_path;
-      char* content_type;
+      char *header_summary;
+      char *file_path;
+      char *content_type;
       int content_length;
 
       headers_map* headers;
