@@ -9,8 +9,6 @@
 #include "configuration.h"
 #include "log.h"
 
-extern struct global_config* configuration;
-
 static int header_field_cb(multipart_parser* p, const char *buf, size_t len);
 static int header_value_cb(multipart_parser* p, const char *buf, size_t len);
 static int part_data_cb(multipart_parser* p, const char *buf, size_t len);

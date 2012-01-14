@@ -10,8 +10,6 @@
 
 #define MAX_PARAMS 10
 
-extern struct global_config* configuration;
-
 typedef struct route {
   action action;
   regex_t* matcher;
@@ -73,7 +71,7 @@ void compile_matcher(route* rt_entry, char *path) {
   char *matcher_re_src = malloc_str(strlen(path) * 2);
 
   // capture named params and build regex
-  while ((status = regexec(configuration->param_match_regex, path + pos, 2, matches, 0)) == 0) {
+  while ((status = regexec(configuration_get()->param_match_regex, path + pos, 2, matches, 0)) == 0) {
     int match_length = matches[1].rm_eo - matches[1].rm_so;
 
     // get everething before parameter in url - step 1: /foo/(:bar)/test -> /foo/

@@ -13,7 +13,6 @@
 #define HOSTNAME_MAX_LEN 1024
 
 extern sig_atomic_t server_socket_fd;
-extern struct global_config* configuration;
 
 void reset_hints(struct addrinfo *hints, int ai_flags) {
   memset(hints, 0, sizeof *hints);
@@ -54,7 +53,7 @@ int bind_server_socket_fd() {
 
   reset_hints(&hints, AI_PASSIVE);
 
-  if ((status = getaddrinfo(NULL, configuration->server_port, &hints, &servinfo)) != 0) {
+  if ((status = getaddrinfo(NULL, configuration_get()->server_port, &hints, &servinfo)) != 0) {
     die("%s", gai_strerror(status));
   }
 
@@ -64,11 +63,11 @@ int bind_server_socket_fd() {
     die("%s", gai_strerror(status));
   }
 
-  if ((status = listen(server_socket_fd, configuration->socket_queue_size)) != 0) {
+  if ((status = listen(server_socket_fd, configuration_get()->socket_queue_size)) != 0) {
     die("%s", gai_strerror(status));
   }
 
-  info("started cosmonaut on %s:%s", configuration->server_name, configuration->server_port);
+  info("started cosmonaut on %s:%s", configuration_get()->server_name, configuration_get()->server_port);
 
   // clean up
   freeaddrinfo(servinfo);

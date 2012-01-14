@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-struct global_config* configuration;
 sig_atomic_t server_socket_fd;
 
 #include "log.h"
@@ -17,7 +16,7 @@ sig_atomic_t server_socket_fd;
 int cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
   int new_connection_fd;
 
-  load_configuration(argc, argv);
+  configuration_init(argc, argv);
 
   if (config_cb != NULL) {
     config_cb();
@@ -37,7 +36,7 @@ int cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
 
       handle_request(new_connection_fd);
 
-      free_configuration();
+      configuration_free();
 
       stopwatch_stop(start_time);
       exit(0);

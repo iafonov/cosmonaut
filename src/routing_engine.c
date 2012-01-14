@@ -9,8 +9,6 @@
 #include "action.h"
 #include "log.h"
 
-extern struct global_config* configuration;
-
 action match_route(http_request* request) {
   char* relative_file_path = create_local_path_from_request_path(request->url->path);
   action matched_action;
@@ -18,7 +16,7 @@ action match_route(http_request* request) {
   if (file_exists(relative_file_path)) {
     matched_action = action_static_file;
   } else {
-    matched_action = routes_map_process_path(configuration->routes, request->url->path, request->params);
+    matched_action = routes_map_process_path(configuration_get()->routes, request->url->path, request->params);
   }
 
   free(relative_file_path);

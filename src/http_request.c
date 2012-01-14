@@ -23,8 +23,6 @@ struct http_request_state {
   char* _last_header_name;
 };
 
-extern struct global_config* configuration;
-
 // http parser callbacks
 static int request_url_cb(http_parser *p, const char *buf, size_t len);
 static int header_field_cb(http_parser *p, const char *buf, size_t len);
@@ -52,11 +50,11 @@ static char* extract_from_buffer(const char *buf, size_t len) {
 }
 
 static char* construct_url(char *path) {
-  int len = strlen("http://") + strlen(configuration->server_name) +
-            strlen(":") + strlen(configuration->server_port) + strlen(path);
+  int len = strlen("http://") + strlen(configuration_get()->server_name) +
+            strlen(":") + strlen(configuration_get()->server_port) + strlen(path);
 
   char* url = malloc_str(len);
-  sprintf(url, "http://%s:%s%s", configuration->server_name, configuration->server_port, path);
+  sprintf(url, "http://%s:%s%s", configuration_get()->server_name, configuration_get()->server_port, path);
   return url;
 }
 
@@ -121,7 +119,7 @@ http_request* http_request_init() {
   request->headers = headers_map_init();
   request->params = params_map_init();
   request->uid = str_random(20);
-  request->configuration = configuration;
+  request->configuration = configuration_get();
 
   request->_s = malloc(sizeof(http_request_state));
   request->_s->free_body_parser_func = NULL;
@@ -143,8 +141,8 @@ void http_request_free(http_request* request) {
 }
 
 char* http_request_uploads_path(http_request* request) {
-  char* result = malloc_str(strlen(configuration->uploads_root) + strlen("/") + strlen(request->uid));
-  sprintf(result, "%s/%s", configuration->uploads_root, request->uid);
+  char* result = malloc_str(strlen(configuration_get()->uploads_root) + strlen("/") + strlen(request->uid));
+  sprintf(result, "%s/%s", configuration_get()->uploads_root, request->uid);
 
   return result;
 }

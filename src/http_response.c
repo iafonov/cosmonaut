@@ -6,8 +6,6 @@
 #include "configuration.h"
 #include "log.h"
 
-extern struct global_config* configuration;
-
 http_response* http_response_init() {
   http_response* response = malloc(sizeof(http_response));
 

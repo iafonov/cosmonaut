@@ -4,8 +4,6 @@
 #include "string_util.h"
 #include "file_util.h"
 
-extern struct global_config* configuration;
-
 #define MAP_CONTENT_TYPE(path, ext, content_type) if (str_ends_with(path, ext)) return strdup(content_type);
 
 static char* content_type_by_path(const char *path) {
@@ -22,8 +20,8 @@ static char* content_type_by_path(const char *path) {
 }
 
 char* create_local_path_from_request_path(const char* request_path) {
-  char *relative_path = malloc_str(strlen(configuration->public_root) + strlen("/") + strlen(request_path));
-  sprintf(relative_path, "%s/%s", configuration->public_root, request_path);
+  char *relative_path = malloc_str(strlen(configuration_get()->public_root) + strlen("/") + strlen(request_path));
+  sprintf(relative_path, "%s/%s", configuration_get()->public_root, request_path);
 
   return relative_path;
 }

@@ -55,8 +55,8 @@ Request structure features the basic data about request: parsed url, headers and
       url *url;
       headers_map *headers;
       params_map *params;
+      configuration *configuration;
       char *uid;
-      struct global_config *configuration;
     };
 
 ## URL

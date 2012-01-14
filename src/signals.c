@@ -17,7 +17,7 @@ void sigint_handler(int signal) {
     die("port unbind failed");
   }
 
-  free_configuration();
+  configuration_free();
   exit(0);
 }
 

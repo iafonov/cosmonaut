@@ -19,7 +19,6 @@
 #include "log.h"
 
 extern int server_socket_fd;
-extern struct global_config* configuration;
 
 void send_response(http_response* response, int socket_fd) {
   char* serialized_headers = http_response_serialize_headers(response);

@@ -13,13 +13,13 @@ typedef struct http_request http_request;
 typedef struct http_request_state http_request_state;
 
 struct http_request {
-	url* url;
- 	headers_map* headers;
+  url* url;
+  headers_map* headers;
   params_map* params;
-	char* uid;
-	struct global_config* configuration;
+  struct configuration* configuration;
 
-	http_request_state* _s;
+  char* uid;
+  http_request_state* _s;
 };
 
 http_request* http_request_init();

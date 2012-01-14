@@ -5,7 +5,7 @@
 
 #include "routes_map.h"
 
-typedef struct global_config {
+typedef struct configuration {
   char* config_path;
   char* server_port;
   char* server_name;
@@ -16,10 +16,12 @@ typedef struct global_config {
 
   regex_t* param_match_regex;
   routes_map* routes;
-} global_config;
+} configuration;
 
-void load_configuration(int argc, char *argv[]);
-void free_configuration();
+void configuration_init(int argc, char *argv[]);
+void configuration_free();
+configuration* configuration_get();
+
 void mount(char* path, action action_cb);
 
 #endif
