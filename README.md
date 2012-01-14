@@ -192,7 +192,7 @@ Cosmonaut follows the principle of a least surprise. Memory is freed only on the
 
 Cosmonaut uses very fast [http-parser](https://github.com/joyent/http-parser) to parse requests and very fast multipart data parser inspired by [node-formidable](https://github.com/felixge/node-formidable) module ported to C.
 
-For now server has the simplest possible networking architecture it uses `accept` to get connections and forks a new process for each connection. Serving static content implemented using `sendfile` system call to send data directly to socket without buffering.
+For now server has the simplest possible networking architecture - it uses `accept` to get connections and forks a new process for each connection. Serving static content implemented using `sendfile` system call to send data directly to socket without buffering.
 
 Routing engine is built on dynamically generated and complied during server boot time regular expressions.
 
@@ -216,44 +216,3 @@ Application features acceptance test suite built with [cucumber](https://github.
 All code except `src/dict.h`, `src/dict.c` and all code in `deps` folder is released under the [MIT License](www.opensource.org/licenses/mit-license.php).
 
 © 2012 [Igor Afonov](http://iafonov.github.com)
-
-# Links
-
-#### Parsers
-
-* HTTP parser used in Node.js (based on nginx implementation): https://github.com/joyent/http-parser
-* Multipart parser: https://github.com/felixge/node-formidable
-* INI key-value file parser: https://github.com/ndevilla/iniparser
-
-#### File upload
-* HTTP Multipart form data rfc: http://www.ietf.org/rfc/rfc2388.txt
-* HTTP file upload rfc: http://www.ietf.org/rfc/rfc1867.txt
-* HTTP file upload rfc explained: http://www.vivtek.com/rfc1867.html
-
-#### Sendfile
-
-* Mac OS X reference: http://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man2/sendfile.2.html
-* Linux: http://kernel.org/doc/man-pages/online/pages/man2/sendfile.2.html
-
-#### Project structure
-
-* http://c.learncodethehardway.org/book/learn-c-the-hard-waych27.html
-* http://www.gnu.org/software/automake/manual/automake.html#Hello-World
-* http://mij.oltrelinux.com/devel/autoconf-automake/
-
-#### IPC
-
-* Awesome guide on IPC: http://beej.us/guide/bgipc/output/html/singlepage/bgipc.html
-* http://linux.die.net/man/2/fork
-
-#### Signals
-
-* http://pubs.opengroup.org/onlinepubs/7908799/xsh/sigaction.html
-* Pointers to functions overview: http://c.learncodethehardway.org/book/learn-c-the-hard-waych19.html#x24-9200019
-* http://www.delorie.com/gnu/docs/glibc/libc_496.html
-
-#### Other
-
-* Awesome networking programming guide: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
-* `libevent` guide: http://www.wangafu.net/~nickm/libevent-book/
-* C book: http://c.learncodethehardway.org/book/
