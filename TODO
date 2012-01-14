@@ -1,4 +1,0 @@
-Do proper streaming with recv/send
-Handle out of memory
-Use perror
-Free request object
