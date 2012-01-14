@@ -3,23 +3,16 @@
 
 #include <sys/types.h>
 
-typedef struct multipart_parser_settings multipart_parser_settings;
 typedef struct multipart_parser multipart_parser;
+typedef struct multipart_parser_settings multipart_parser_settings;
+typedef struct multipart_parser_state multipart_parser_state;
 
 typedef int (*multipart_data_cb) (multipart_parser*, const char *at, size_t length);
 typedef int (*multipart_notify_cb) (multipart_parser*);
 
 struct multipart_parser {
   void* data;
-  int index;
-  unsigned char state;
-  multipart_parser_settings* settings;
-
-  int _parsed;
-  int _boundary_length;
-  int _flags;
-  char* _lookbehind;
-  char* _multipart_boundary;
+  multipart_parser_state* _s;
 };
 
 struct multipart_parser_settings {

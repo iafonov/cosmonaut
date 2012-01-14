@@ -11,34 +11,33 @@
 #define log(M, ...)
 #endif
 
-#define NOTIFY_CB(FOR)                                               \
-do {                                                                 \
-  if (p->settings->on_##FOR) {                                       \
-    if (p->settings->on_##FOR(p) != 0) {                             \
-      return i;                                                      \
-    }                                                                \
-  }                                                                  \
+#define NOTIFY_CB(FOR)                                                 \
+do {                                                                   \
+  if (p->_s->settings->on_##FOR) {                                     \
+    if (p->_s->settings->on_##FOR(p) != 0) {                           \
+      return i;                                                        \
+    }                                                                  \
+  }                                                                    \
 } while (0)
 
-#define EMIT_DATA_CB(FOR)                                            \
-do {                                                                 \
-  if (p->settings->on_##FOR) {                                       \
-    if (p->settings->on_##FOR(p, (buf + mark), (i - mark)) != 0) {   \
-      return i;                                                      \
-    }                                                                \
-  }                                                                  \
+#define EMIT_DATA_CB(FOR)                                              \
+do {                                                                   \
+  if (p->_s->settings->on_##FOR) {                                     \
+    if (p->_s->settings->on_##FOR(p, (buf + mark), (i - mark)) != 0) { \
+      return i;                                                        \
+    }                                                                  \
+  }                                                                    \
 } while (0)
 
-#define EMIT_PART_DATA_CB(FOR)                                       \
-do {                                                                 \
-  if (p->settings->on_##FOR) {                                       \
-    p->_parsed = p->_parsed + (i - mark);                            \
-    if (p->settings->on_##FOR(p, (buf + mark), (i - mark)) != 0) {   \
-      return i;                                                      \
-    }                                                                \
-  }                                                                  \
+#define EMIT_PART_DATA_CB(FOR)                                         \
+do {                                                                   \
+  if (p->_s->settings->on_##FOR) {                                     \
+    p->_s->parsed = p->_s->parsed + (i - mark);                        \
+    if (p->_s->settings->on_##FOR(p, (buf + mark), (i - mark)) != 0) { \
+      return i;                                                        \
+    }                                                                  \
+  }                                                                    \
 } while (0)
-
 
 #define LF 10
 #define CR 13
@@ -48,6 +47,20 @@ do {                                                                 \
 #define A 97
 #define Z 122
 #define LOWER(c) (unsigned char)(c | 0x20)
+
+struct multipart_parser_state {
+  int index;
+  int parsed;
+  int boundary_length;
+  int flags;
+
+  unsigned char state;
+
+  char* lookbehind;
+  char* multipart_boundary;
+
+  multipart_parser_settings* settings;
+};
 
 enum state {
   s_uninitialized = 1,
@@ -69,74 +82,75 @@ enum parser_flags {
   f_last_boundary
 };
 
-// public api
 multipart_parser* init_multipart_parser(char *boundary, multipart_parser_settings* settings) {
   multipart_parser* p = malloc(sizeof(multipart_parser));
-  p->index = 0;
-  p->state = s_start;
-  p->settings = settings;
+  p->_s = malloc(sizeof(multipart_parser_state));
+  p->_s->index = 0;
+  p->_s->state = s_start;
+  p->_s->settings = settings;
 
-  p->_multipart_boundary = strdup(boundary);
-  p->_boundary_length = strlen(boundary);
-  p->_flags = 0;
-  p->_lookbehind = NULL;
-  p->_parsed = 0;
+  p->_s->multipart_boundary = strdup(boundary);
+  p->_s->boundary_length = strlen(boundary);
+  p->_s->flags = 0;
+  p->_s->lookbehind = NULL;
+  p->_s->parsed = 0;
   return p;
 }
 
 void free_multipart_parser(multipart_parser* p) {
-  free(p->_multipart_boundary);
-  free(p->_lookbehind);
+  free(p->_s->multipart_boundary);
+  free(p->_s->lookbehind);
+  free(p->_s);
   free(p);
 }
 
 int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
   int i = 0;
   int mark = 0;
-  int prevIndex = 0;
+  int prev_index = 0;
 
   for (i = 0; i < len; i++) {
     char c = buf[i];
-    switch (p->state) {
+    switch (p->_s->state) {
       case s_start:
         log("s_start");
-        p->_lookbehind = malloc(p->_boundary_length + 8 + 1);
+        p->_s->lookbehind = malloc(p->_s->boundary_length + 8 + 1);
 
-        p->index = 0;
-        p->state = s_start_boundary;
+        p->_s->index = 0;
+        p->_s->state = s_start_boundary;
         break;
       case s_start_boundary:
         log("s_start_boundary");
-        if (p->index == strlen(p->_multipart_boundary) - 1) {
+        if (p->_s->index == strlen(p->_s->multipart_boundary) - 1) {
           if (c != CR) {
             return i;
           }
-          p->index++;
+          p->_s->index++;
           break;
-        } else if (p->index == (strlen(p->_multipart_boundary))) {
+        } else if (p->_s->index == (strlen(p->_s->multipart_boundary))) {
           if (c != LF) {
             return i;
           }
-          p->index = 0;
+          p->_s->index = 0;
           NOTIFY_CB(part_data_begin);
-          p->state = s_header_field_start;
+          p->_s->state = s_header_field_start;
           break;
         }
 
-        if (c != p->_multipart_boundary[p->index + 1]) {
+        if (c != p->_s->multipart_boundary[p->_s->index + 1]) {
           return i;
         }
 
-        p->index++;
+        p->_s->index++;
         break;
       case s_header_field_start:
         log("s_header_field_start");
         mark = i;
-        p->state = s_header_field;
+        p->_s->state = s_header_field;
       case s_header_field:
         log("s_header_field");
         if (c == CR) {
-          p->state = s_headers_almost_done;
+          p->_s->state = s_headers_almost_done;
           break;
         }
 
@@ -146,7 +160,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
 
         if (c == COLON) {
           EMIT_DATA_CB(header_field);
-          p->state = s_header_value_start;
+          p->_s->state = s_header_value_start;
           break;
         }
 
@@ -163,7 +177,7 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
           return i;
         }
 
-        p->state = s_part_data_start;
+        p->_s->state = s_part_data_start;
         break;
       case s_header_value_start:
         log("s_header_value_start");
@@ -172,12 +186,12 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         }
 
         mark = i;
-        p->state = s_header_value;
+        p->_s->state = s_header_value;
       case s_header_value:
         log("s_header_value");
         if (c == CR) {
           EMIT_DATA_CB(header_value);
-          p->state = s_header_value_almost_done;
+          p->_s->state = s_header_value_almost_done;
         }
 
         if (i == len - 1) EMIT_DATA_CB(header_value);
@@ -187,20 +201,20 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
         if (c != LF) {
           return i;
         }
-        p->state = s_header_field_start;
+        p->_s->state = s_header_field_start;
         break;
       case s_part_data_start:
         log("s_part_data_start");
         NOTIFY_CB(headers_complete);
         mark = i;
-        p->state = s_part_data;
+        p->_s->state = s_part_data;
       case s_part_data:
         log("s_part_data");
-        prevIndex = p->index;
+        prev_index = p->_s->index;
 
-        if (p->index < p->_boundary_length) {
-          if (p->_multipart_boundary[p->index] == c) {
-            if (p->index == 0) {
+        if (p->_s->index < p->_s->boundary_length) {
+          if (p->_s->multipart_boundary[p->_s->index] == c) {
+            if (p->_s->index == 0) {
               // very ugly way to omit emitting trailing CR+LF which doesn't belong to file but
               // rather belong to multipart stadard
               int adjustment = 0;
@@ -212,71 +226,71 @@ int multipart_parser_execute(multipart_parser* p, const char *buf, size_t len) {
               EMIT_PART_DATA_CB(part_data);
               i = i + adjustment;
             }
-            p->index++;
+            p->_s->index++;
           } else {
-            p->index = 0;
+            p->_s->index = 0;
           }
-        } else if (p->index == p->_boundary_length) {
-          p->index++;
+        } else if (p->_s->index == p->_s->boundary_length) {
+          p->_s->index++;
           if (c == CR) {
             // CR = part boundary
-            p->_flags |= f_part_boundary;
+            p->_s->flags |= f_part_boundary;
           } else if (c == HYPHEN) {
             // HYPHEN = end boundary
-            p->_flags |= f_last_boundary;
+            p->_s->flags |= f_last_boundary;
           } else {
-            p->index = 0;
+            p->_s->index = 0;
           }
-        } else if (p->index - 1 == p->_boundary_length)  {
-          if (p->_flags & f_part_boundary) {
-            p->index = 0;
+        } else if (p->_s->index - 1 == p->_s->boundary_length)  {
+          if (p->_s->flags & f_part_boundary) {
+            p->_s->index = 0;
             if (c == LF) {
               // unset the PART_BOUNDARY flag
-              p->_flags &= ~f_part_boundary;
+              p->_s->flags &= ~f_part_boundary;
               NOTIFY_CB(part_data_end);
               NOTIFY_CB(part_data_begin);
-              p->state = s_header_field_start;
+              p->_s->state = s_header_field_start;
               break;
             }
-          } else if (p->_flags & f_last_boundary) {
+          } else if (p->_s->flags & f_last_boundary) {
             if (c == HYPHEN) {
-              p->index++;
+              p->_s->index++;
             } else {
-              p->index = 0;
+              p->_s->index = 0;
             }
           } else {
-            p->index = 0;
+            p->_s->index = 0;
           }
-        } else if (p->index - 2 == p->_boundary_length)  {
+        } else if (p->_s->index - 2 == p->_s->boundary_length)  {
           if (c == CR) {
-            p->index++;
+            p->_s->index++;
           } else {
-            p->index = 0;
+            p->_s->index = 0;
           }
-        } else if (p->index - p->_boundary_length == 3)  {
-          p->index = 0;
+        } else if (p->_s->index - p->_s->boundary_length == 3)  {
+          p->_s->index = 0;
           if (c == LF) {
             NOTIFY_CB(part_data_end);
             NOTIFY_CB(body_end);
-            p->state = s_end;
+            p->_s->state = s_end;
             break;
           }
         }
 
-        if (p->index > 0) {
+        if (p->_s->index > 0) {
           // when matching a possible boundary, keep a lookbehind reference
           // in case it turns out to be a false lead
-          p->_lookbehind[p->index - 1] = c;
-        } else if (prevIndex > 0) {
+          p->_s->lookbehind[p->_s->index - 1] = c;
+        } else if (prev_index > 0) {
           // if our boundary turned out to be rubbish, the captured lookbehind
           // belongs to partData
-          p->_parsed = p->_parsed + prevIndex;
-          p->settings->on_part_data(p, p->_lookbehind, prevIndex);
-          prevIndex = 0;
+          p->_s->parsed = p->_s->parsed + prev_index;
+          p->_s->settings->on_part_data(p, p->_s->lookbehind, prev_index);
+          prev_index = 0;
           mark = i;
         }
 
-        if (p->index == 0 && i == len - 1) {
+        if (p->_s->index == 0 && i == len - 1) {
           i++;
           EMIT_PART_DATA_CB(part_data);
         }
