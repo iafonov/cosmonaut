@@ -4,13 +4,7 @@ Fast web server & micro framework written in C. Just for fun.
 
 The main idea behind cosmonaut - minimalism. It provides only minimal required functionality to process http requests and exposes as much details to application layer as possible. It could be used both as standalone application platform or as an underlying layer for a higher level framework powered by a higher level language.
 
-The main purpose of using it as a standalone application is covering performance critical sections of application. For example you can use it to power/process your uploads or serve static content.
-
-## Under the hood
-
-Cosmonaut uses very fast [http-parser](https://github.com/joyent/http-parser) to parse requests and very fast multipart data parser inspired by [node-formidable](https://github.com/felixge/node-formidable) module but implemented in C.
-
-For now server has the simplest possible networking architecture it uses `accept` to get connections and forks a new process for each connection. Serving static content implemented using `sendfile` system call to send data directly to socket without buffering.
+The main purpose of using it as a standalone application is covering performance critical sections of application. For example you can use it to power/process your uploads or serve dynamic content which is sensitive to response time.
 
 ## Building & installation
 
@@ -51,11 +45,11 @@ Server lifecycle is very simple and straightforward:
 
 Action is a simple function that accepts `http_request` and `http_response` structs as parameters and fills the last one with the data according to request data.
 
-    typedef void (*action)(http_request* request, http_response* response);
+    typedef void (*action)(http_request *request, http_response *response);
 
 ## Request
 
-Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid`. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. 
+Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid` that could be used for logging. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. See configuration in-detail description further.
 
     struct http_request {
       url *url;
@@ -67,7 +61,7 @@ Request structure features the basic data about request: parsed url, headers and
 
 ## URL
 
-This structure represents parsed url parts.
+`url` structure represents parsed url parts.
 
     typedef struct url {
       char *scheme;
@@ -82,9 +76,35 @@ This structure represents parsed url parts.
 
 ## Accessing headers
 
+  Headers are parsed and put into hash map. Here is some examples on how you can access header values:
+
+    char *content_type = headers_map_get(request->headers, "Content-Type");
+
+  If header is not present the accessor function will return `NULL`.
+
 ## Accessing parameters
 
+### Parameters map
+
+  Parameters both from request and from the url are parsed and put into `params` hash map.
+
+    param_entry* param = params_map_get(request->params, "param_name");
+
+### Parameter definition
+
+  Parameter itself is represented as a structure which consists of parameter name, value and in case of multipart upload it would have uploaded file handler. You can use `is_file` flag to determine whether parameter value is a string or a file. File handler is closed so you'll have to reopen it if you'll want to modify file. Uploaded files by default are stored in `[uploads_root]/[request_uid]/[file_name]` path.
+
+    typedef struct param_entry {
+      char *name;
+      char *val;
+
+      bool is_file;
+      FILE *file;
+    } param_entry;
+
 ## Response
+
+  Response is structure that you have to fill in order to send data to client. It consists of code, headers and response data. In most cases you shouldn't use this fields directly but rather it's more convenient to invoke on of several built-in rendering helpers or create your own to hide complexity and make your actions smaller and easier to understand.
 
     typedef struct http_response {
       int code;
@@ -99,7 +119,7 @@ This structure represents parsed url parts.
 
 ## Rendering helpers
 
-There are several pre-defined rendering helpers - they set correct corresponding headers and put data to `http_response` object (like `content-type`, `content_length` etc.)
+There are several pre-defined rendering helpers - they set correct corresponding headers and fill `http_response` object.
 
     render_file(http_response *response, const char *path);
     render_text(http_response *response, const char *text);
@@ -107,7 +127,85 @@ There are several pre-defined rendering helpers - they set correct corresponding
 
 ## Routing
 
+The routing system is very simple and straightforward but at the same time it is very powerful and you can use it as the first stage of routing and then do more tricky rerouting in your own wrapper.
+
+### Simple action mounting
+
+The most simple use-case is binding an action to the route. Whenever user will want to access this path you action would be executed.
+
+    mount("/", action_index);
+    mount("/upload_file", action_upload);
+
+### Parameters capturing
+
+Cosmonaut supports capturing named parameters. Everything between two slashes would be captured and put into the params map with corresponding name.
+
+    mount("/photos/(:id)", action_show_photo);
+
+    void action_show_photo(http_request *request, http_response *response) {
+      int photo_id = params_map_get(request->params, "id")->val;
+      ...
+    }
+
+### Advanced use cases
+
+As mentioned before routing system could be used as a first stage of the more smart & application specific routing system. Here is use case which demonstrates mounting a RESTful application to a route.
+
+    mount("/patients/(:id)/(:action)", patients_controller);
+
+    void patients_controller(http_request *request, http_response *response) {
+      char *action = params_map_get(request->params, "action")->val;
+      int patient_id = params_map_get(request->params, "id")->val;
+
+      ...
+
+      process_data(patient, action, response);
+    }
+
+Examples of paths that would match this route:
+
+    /patients/1/new
+    /patients/1/show
+    /patients/1/edit
+    /patients/1/delete
+
+### Handling 404 errors
+
+If there are no actions that match requested route `[public_root]/404.html` would be rendered and appropriate http response code would be set.
+
 ## Configuration options
+
+    [network]
+    port = 31337;
+    socket_queue_size = 80;
+    server_name = 127.0.0.1;
+
+    [app]
+    public_root = ./public;
+    uploads_root = ./public/uploads;
+
+## Memory management
+
+Cosmonaut follows the principle of a least surprise. Memory is freed only on the same level as it was allocated. So if you're passing chunks of data into any of built-in functions - your code is responsible for clean-up. The same principle is applied to built-in functions - if you're accessing data from params/headers you don't have to free it - the data from built-in data sources would be cleaned up automatically by framework functions which were responsible for allocating it.
+
+# Under the hood
+
+Cosmonaut uses very fast [http-parser](https://github.com/joyent/http-parser) to parse requests and very fast multipart data parser inspired by [node-formidable](https://github.com/felixge/node-formidable) module ported to C.
+
+For now server has the simplest possible networking architecture it uses `accept` to get connections and forks a new process for each connection. Serving static content implemented using `sendfile` system call to send data directly to socket without buffering.
+
+Routing engine is built on dynamically generated and complied during server boot time regular expressions.
+
+## Conventions & project structure
+
+Server is built from simple modules. Each module has two required function `module_init` which is responsible for allocating memory and setting initial values and `module_free` which is responsible for freeing memory. All module related function names start with `module_` prefix.
+
+    typedef struct module;
+
+    module* module_init();
+    void module_free(module* m);
+
+    void module_do_work(module *m, ...params);
 
 # Links
 
