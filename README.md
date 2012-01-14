@@ -207,6 +207,16 @@ Server is built from simple modules. Each module has two required function `modu
 
     void module_do_work(module* m, ...);
 
+## Testing
+
+Application features acceptance test suite built with [cucumber](https://github.com/cucumber/cucumbe) & [rest-client](https://github.com/archiloque/rest-client). Run `make && make test` to run acceptance test suite. (Requires ruby & bundler)
+
+## License & copyright
+
+All code except `src/dict.h`, `src/dict.c` and all code in `deps` folder is released under the [MIT License](www.opensource.org/licenses/mit-license.php).
+
+© 2012 [Igor Afonov](http://iafonov.github.com)
+
 # Links
 
 #### Parsers
