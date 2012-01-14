@@ -104,7 +104,7 @@ Request structure features the basic data about request: parsed url, headers and
 
 ## Response
 
-  Response is structure that you have to fill in order to send data to client. It consists of code, headers and response data. In most cases you shouldn't use this fields directly but rather it's more convenient to invoke on of several built-in rendering helpers or create your own to hide complexity and make your actions smaller and easier to understand.
+  Response is structure that you have to fill in order to send data to client. It consists of code, headers and response data. In most cases you shouldn't use this fields directly but rather it's more convenient to invoke one of several built-in rendering helpers or create your own to hide complexity and make your actions smaller and easier to understand.
 
     typedef struct http_response {
       int code;
