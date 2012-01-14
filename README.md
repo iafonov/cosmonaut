@@ -12,7 +12,7 @@ Supported platforms: Ubuntu 10.04 (`build-essentials` is required), Mac OS X 10.
 
 1. Clone project
 2. Cross your fingers
-3. Run `make` it should build application with its dependencies
+3. Run `make` to build application with its dependencies
 4. Run `make test` to run test suite
 5. Run `make install` to install both static and dynamic libraries and headers
 
@@ -43,7 +43,7 @@ Server lifecycle is very simple and straightforward:
 
 ## Action
 
-Action is a simple function that accepts `http_request` and `http_response` structs as parameters and fills the last one with the data according to request data.
+Action is a simple function that accepts `http_request` and `http_response` structs as parameters and fills the last one with the data according to the request data.
 
     typedef void (*action)(http_request *request, http_response *response);
 
@@ -127,7 +127,7 @@ There are several pre-defined rendering helpers - they set correct corresponding
 
 ## Routing
 
-The routing system is very simple and straightforward but at the same time it is very powerful and you can use it as the first stage of routing and then do more tricky rerouting in your own wrapper.
+The routing system is very simple and straightforward but at the same time it's very powerful and you can use it as the first stage of routing and then do more tricky rerouting in your own wrapper.
 
 ### Simple action mounting
 
@@ -205,7 +205,7 @@ Server is built from simple modules. Each module has two required function `modu
     module* module_init();
     void module_free(module* m);
 
-    void module_do_work(module *m, ...params);
+    void module_do_work(module* m, ...);
 
 # Links
 
