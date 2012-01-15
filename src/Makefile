@@ -2,11 +2,11 @@ OBJ = ../deps/url_parser/url.o \
       ../deps/iniparser/dictionary.o \
       ../deps/iniparser/iniparser.o \
       ../deps/http_parser/http_parser.o \
+      ../deps/multipart-parser-c/multipart_parser.o \
       cosmonaut.o \
       params_map.o \
       mpart_body_processor.o \
       attrs_map.o \
-      multipart_parser.o \
       str_map.o \
       log.o \
       headers_map.o \

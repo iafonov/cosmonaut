@@ -1,10 +1,10 @@
 #ifndef _mpart_body_processor_h
 #define _mpart_body_processor_h
 
-#include "multipart_parser.h"
+#include "../deps/http_parser/http_parser.h"
+#include "../deps/multipart-parser-c/multipart_parser.h"
 #include "http_request.h"
 #include "params_map.h"
-#include "../deps/http_parser/http_parser.h"
 
 typedef struct mpart_body_processor {
   http_request* request;

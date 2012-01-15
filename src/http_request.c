@@ -7,9 +7,9 @@
 #include "log.h"
 #include "configuration.h"
 #include "attrs_map.h"
-#include "multipart_parser.h"
 #include "mpart_body_processor.h"
 
+#include "../deps/multipart-parser-c/multipart_parser.h"
 #include "../deps/http_parser/http_parser.h"
 
 #define CR '\r'
