@@ -131,7 +131,7 @@ The routing system is very simple and straightforward but at the same time it's 
 
 ### Simple action mounting
 
-The most simple use-case is binding an action to the route. Whenever user will want to access this path you action would be executed.
+The most simple use-case is binding an action to the route. Whenever user will want to access this path your action would be executed.
 
     mount("/", action_index);
     mount("/upload_file", action_upload);
