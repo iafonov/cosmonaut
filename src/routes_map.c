@@ -77,29 +77,6 @@ route* routes_map_match(routes_map *rt_map, const char *path, params_map* params
   return result;
 }
 
-action routes_map_process_path(routes_map *rt_map, const char *path, params_map* params) {
-  char *normalized_path = create_normalized_path(path);
-  action matched_action = action_404;
-
-  dictIterator* dict_iterator;
-  dictEntry* dict_entry;
-  route *rt_entry;
-
-  dict_iterator = dictGetIterator(rt_map);
-  while((dict_entry = dictNext(dict_iterator)) != NULL) {
-    rt_entry = dictGetEntryVal(dict_entry);
-
-    if (route_match(rt_entry, normalized_path, params)) {
-      matched_action = rt_entry->action;
-      break;
-    }
-  }
-
-  free(dict_iterator);
-  free(normalized_path);
-  return matched_action;
-}
-
 route* routes_map_add(routes_map *rt_map, char *path, action action) {
   route* route = route_init(path, action);
 
