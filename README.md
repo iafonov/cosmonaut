@@ -49,13 +49,15 @@ Action is a simple function that accepts `http_request` and `http_response` stru
 
 ## Request
 
-Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid` that could be used for logging. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. See configuration in-detail description further.
+Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid` that could be used for logging. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. See configuration in-detail description further. `route` is struct which represents selected route for this request. Route is selected by routing engine immediately after first line of request is parsed.
 
     struct http_request {
       url *url;
       headers_map *headers;
       params_map *params;
       configuration *configuration;
+      route *route;
+
       char *uid;
     };
 
@@ -172,6 +174,35 @@ Examples of paths that would match this route:
 ### Handling 404 errors
 
 If there are no actions that match requested route `[public_root]/404.html` would be rendered and appropriate http response code would be set.
+
+### Filters
+
+Filters are simple callbacks that are executed at various points of request lifecycle.
+
+    typedef void (*filter)(http_request* request);
+
+You can set filters by attaching callbacks to routes in your `configure` function.
+
+    route* rt = mount("/files/new/(:upload_id)", action_upload);
+    rt->before_filter = check_upload_size;
+    rt->after_filter = do_something;
+
+### Hooks
+
+Hooks are specific callbacks that are called during parsing request. The main difference of hooks and filters is in their definition & interface - hooks are more specific and filters are more general. For now there is only on hook: `progress_hook` it is called every time after new chunk of data is processed. It passes already parsed amount and content length. It could be used for tracking upload progress and must be setup in route's `before_filter`.
+
+    route* rt = mount("/files/new/(:upload_id)", action_upload);
+    rt->before_filter = set_progress_hook;
+
+    ...
+
+    void set_progress_hook(http_request* request) {
+      request->progress_hook = capture_progress;
+    }
+
+    void capture_progress(int content_length, int parsed) {
+      info("Progress: %d -> %d", parsed, content_length);
+    }
 
 ## Configuration options
 

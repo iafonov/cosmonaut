@@ -12,12 +12,16 @@
 typedef struct http_request http_request;
 typedef struct http_request_state http_request_state;
 
+typedef void (*progress_hook)(int content_length, int parsed);
+
 struct http_request {
   url* url;
   headers_map* headers;
   params_map* params;
   struct configuration* configuration;
-	struct route* route;
+  struct route* route;
+
+  progress_hook progress_hook;
 
   char* uid;
   http_request_state* _s;

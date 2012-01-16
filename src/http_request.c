@@ -21,6 +21,8 @@ struct http_request_state {
   void* body_processor;
   free_body_parser free_body_parser_func;
   char* _last_header_name;
+  int parsed;
+  int content_length;
 };
 
 // http parser callbacks
@@ -92,12 +94,20 @@ static int mpart_body_process(http_parser *p, const char *buf, size_t len) {
   http_request* request = (http_request*)p->data;
   mpart_body_processor* processor = (mpart_body_processor*)request->_s->body_processor;
 
-  multipart_parser_execute(processor->parser, buf, len);
+  request->_s->parsed += multipart_parser_execute(processor->parser, buf, len);
+
+  if (request->progress_hook) {
+    request->progress_hook(request->_s->content_length, request->_s->parsed);
+  }
+
   return 0;
 }
 
 static int headers_complete_cb(http_parser *p) {
   http_request* request = (http_request*)p->data;
+  if (headers_map_get(request->headers, "Content-Length")) {
+    request->_s->content_length = atoi(headers_map_get(request->headers, "Content-Length"));
+  }
 
   route_execute_before_filter(request->route, request);
 
@@ -124,8 +134,12 @@ http_request* http_request_init() {
   request->uid = str_random(20);
   request->configuration = configuration_get();
 
+  request->progress_hook = NULL;
+
   request->_s = malloc(sizeof(http_request_state));
   request->_s->free_body_parser_func = NULL;
+  request->_s->parsed = 0;
+  request->_s->content_length = 0;
 
   return request;
 }
@@ -152,16 +166,15 @@ char* http_request_uploads_path(http_request* request) {
 
 void http_request_parse(http_request* request, int socket_fd) {
   char request_buffer[DATA_CHUNK_SIZE];
-  int chunk_received = 0, received = 0;
+  int received = 0;
 
   http_parser* parser = malloc(sizeof(http_parser));
   http_parser_init(parser, HTTP_REQUEST);
   parser->data = request;
 
-  while ((chunk_received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
-    received += chunk_received;
-    http_parser_execute(parser, &settings, request_buffer, chunk_received);
-    if (chunk_received < DATA_CHUNK_SIZE) break;
+  while ((received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
+    http_parser_execute(parser, &settings, request_buffer, received);
+    if (received < DATA_CHUNK_SIZE) break;
   }
 
   free(parser);
