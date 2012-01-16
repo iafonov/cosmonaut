@@ -75,6 +75,6 @@ char* configuration_convert_path_to_local(const char* request_path) {
   return relative_path;
 }
 
-void mount(char* path, action action_cb) {
-  routes_map_add(config->routes, path, action_cb);
+route* mount(char* path, action action_cb) {
+  return routes_map_add(config->routes, path, action_cb);
 }

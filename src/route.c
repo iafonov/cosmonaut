@@ -70,10 +70,18 @@ bool route_match(route* route, const char *path, params_map* params) {
   return match;
 }
 
+void route_execute_before_filter(route *route, http_request *request) {
+  if (route && route->before_filter) {
+    route->before_filter(request);
+  }
+}
+
 route* route_init(char *path, action action) {
   route* result = malloc(sizeof(route));
 
   result->action = action;
+  result->before_filter = NULL;
+  result->after_filter = NULL;
   result->named_params_count = 0;
 
   compile(result, path);
@@ -81,15 +89,6 @@ route* route_init(char *path, action action) {
   return result;
 }
 
-route* route_copy(const route *src) {
-  route *dup = malloc(sizeof(route));
-  memcpy(dup, src, sizeof(*dup));
-
-  ((route* )dup)->matcher = ((route* )src)->matcher;
-
-  return dup;
-}
-
 void route_free(route* route) {
-  
+  free(route);
 }

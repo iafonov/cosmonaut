@@ -9,16 +9,16 @@
 #include "action.h"
 #include "log.h"
 
-action routing_engine_match(http_request* request) {
+void routing_engine_execute_action(http_request *request, http_response *response) {
   char* relative_file_path = configuration_convert_path_to_local(request->url->path);
-  action matched_action;
 
   if (file_exists(relative_file_path)) {
-    matched_action = action_static_file;
+    action_static_file(request, response);
+  } else if (request->route) {
+    request->route->action(request, response);
   } else {
-    matched_action = routes_map_process_path(configuration_get()->routes, request->url->path, request->params);
+    action_404(request, response);
   }
 
   free(relative_file_path);
-  return matched_action;
 }

@@ -3,8 +3,7 @@
 
 #include "http_request.h"
 #include "http_response.h"
-#include "action.h"
 
-action routing_engine_match(http_request* request);
+void routing_engine_execute_action(http_request *request, http_response *response);
 
 #endif

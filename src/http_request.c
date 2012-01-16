@@ -64,6 +64,7 @@ static int request_url_cb(http_parser *p, const char *buf, size_t len) {
   char *request_url = construct_url(path);
 
   request->url = url_init(request_url);
+  request->route = routes_map_match(configuration_get()->routes, request->url->path, request->params);
 
   free(path);
   free(request_url);
@@ -97,6 +98,8 @@ static int mpart_body_process(http_parser *p, const char *buf, size_t len) {
 
 static int headers_complete_cb(http_parser *p) {
   http_request* request = (http_request*)p->data;
+
+  route_execute_before_filter(request->route, request);
 
   if (is_multipart(request)) {
     request->_s->body_processor = mpart_body_processor_init(request);
@@ -157,7 +160,6 @@ void http_request_parse(http_request* request, int socket_fd) {
 
   while ((chunk_received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
     received += chunk_received;
-    info("PROGRESS %d", received);
     http_parser_execute(parser, &settings, request_buffer, chunk_received);
     if (chunk_received < DATA_CHUNK_SIZE) break;
   }

@@ -54,10 +54,7 @@ void handle_request(int socket_fd) {
 
   http_request_parse(request, socket_fd);
 
-  action matched_action = routing_engine_match(request);
-  if (matched_action) {
-    matched_action(request, response);
-  }
+  routing_engine_execute_action(request, response);
 
   send_response(response, socket_fd);
 
