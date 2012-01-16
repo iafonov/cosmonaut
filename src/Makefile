@@ -4,6 +4,7 @@ OBJ = ../deps/url_parser/url.o \
       ../deps/http_parser/http_parser.o \
       ../deps/multipart-parser-c/multipart_parser.o \
       cosmonaut.o \
+			route.o \
       params_map.o \
       mpart_body_processor.o \
       attrs_map.o \

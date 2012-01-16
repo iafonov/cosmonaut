@@ -3,6 +3,7 @@
 
 #include <regex.h>
 
+#include "action.h"
 #include "routes_map.h"
 
 typedef struct configuration {
