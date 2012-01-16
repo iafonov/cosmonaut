@@ -22,6 +22,8 @@ void configuration_init(int argc, char *argv[]);
 void configuration_free();
 configuration* configuration_get();
 
+char* configuration_convert_path_to_local(const char* request_path);
+
 void mount(char* path, action action_cb);
 
 #endif

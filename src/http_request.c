@@ -149,15 +149,17 @@ char* http_request_uploads_path(http_request* request) {
 
 void http_request_parse(http_request* request, int socket_fd) {
   char request_buffer[DATA_CHUNK_SIZE];
-  int received = 0;
+  int chunk_received = 0, received = 0;
 
   http_parser* parser = malloc(sizeof(http_parser));
   http_parser_init(parser, HTTP_REQUEST);
   parser->data = request;
 
-  while ((received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
-    http_parser_execute(parser, &settings, request_buffer, received);
-    if (received < DATA_CHUNK_SIZE) break;
+  while ((chunk_received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
+    received += chunk_received;
+    info("PROGRESS %d", received);
+    http_parser_execute(parser, &settings, request_buffer, chunk_received);
+    if (chunk_received < DATA_CHUNK_SIZE) break;
   }
 
   free(parser);

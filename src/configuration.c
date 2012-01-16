@@ -1,6 +1,7 @@
 #include "log.h"
 #include "configuration.h"
 #include "networking.h"
+#include "string_util.h"
 #include "../deps/iniparser/iniparser.h"
 
 #define DEFAULT_CONFIG_FILE "./config/cosmonaut.conf"
@@ -65,6 +66,13 @@ void configuration_free() {
 
 configuration* configuration_get() {
   return config;
+}
+
+char* configuration_convert_path_to_local(const char* request_path) {
+  char *relative_path = malloc_str(strlen(configuration_get()->public_root) + strlen("/") + strlen(request_path));
+  sprintf(relative_path, "%s/%s", configuration_get()->public_root, request_path);
+
+  return relative_path;
 }
 
 void mount(char* path, action action_cb) {

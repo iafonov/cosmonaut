@@ -9,8 +9,8 @@
 #include "action.h"
 #include "log.h"
 
-action match_route(http_request* request) {
-  char* relative_file_path = create_local_path_from_request_path(request->url->path);
+action routing_engine_match(http_request* request) {
+  char* relative_file_path = configuration_convert_path_to_local(request->url->path);
   action matched_action;
 
   if (file_exists(relative_file_path)) {

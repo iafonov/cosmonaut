@@ -5,6 +5,6 @@
 #include "http_response.h"
 #include "action.h"
 
-action match_route(http_request* request);
+action routing_engine_match(http_request* request);
 
 #endif

@@ -14,6 +14,7 @@ OBJ = ../deps/url_parser/url.o \
       platform.o \
       file_util.o \
       routing_engine.o \
+			render.o \
       action.o \
       http_response.o \
       base_request_handler.o \
