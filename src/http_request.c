@@ -97,7 +97,7 @@ static int mpart_body_process(http_parser *p, const char *buf, size_t len) {
   request->_s->parsed += multipart_parser_execute(processor->parser, buf, len);
 
   if (request->progress_hook) {
-    request->progress_hook(request->_s->content_length, request->_s->parsed);
+    request->progress_hook(request, request->_s->content_length, request->_s->parsed);
   }
 
   return 0;

@@ -49,7 +49,7 @@ Action is a simple function that accepts `http_request` and `http_response` stru
 
 ## Request
 
-Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid` that could be used for logging. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. See configuration in-detail description further. `route` is struct which represents selected route for this request. Route is selected by routing engine immediately after first line of request is parsed.
+Request structure features the basic data about request: parsed url, headers and params. It has two special fields `uid` and `configuration`. Server tags all requests with a unique identifier `uid` that could be used for logging. `configuration` is a pointer to structure with information about server configuration. You can retrieve data about server port, host, public root path and other various server runtime parameters. See configuration in-detail description further. `route` is struct which represents selected route for this request. Route is selected by routing engine immediately after first line of request is parsed. `data` is a pointer to your own piece of data. It could be used to persist and share state between filters, hooks and actions. Canonical use case is keeping connection to database between filters and action.
 
     struct http_request {
       url *url;
@@ -57,7 +57,7 @@ Request structure features the basic data about request: parsed url, headers and
       params_map *params;
       configuration *configuration;
       route *route;
-
+      void *data;
       char *uid;
     };
 
@@ -215,7 +215,7 @@ Hooks are specific callbacks that are called during parsing request. The main di
     public_root = ./public;
     uploads_root = ./public/uploads;
 
-## Memory management
+# Memory management
 
 Cosmonaut follows the principle of a least surprise. Memory is freed only on the same level as it was allocated. So if you're passing chunks of data into any of built-in functions - your code is responsible for clean-up. The same principle is applied to built-in functions - if you're accessing data from params/headers you don't have to free it - the data from built-in data sources would be cleaned up automatically by framework functions which were responsible for allocating it.
 

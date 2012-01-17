@@ -4,6 +4,7 @@
 #include "http_request.h"
 #include "http_response.h"
 #include "configuration.h"
+#include "render.h"
 
 typedef void (*configure_app_cb) ();
 
