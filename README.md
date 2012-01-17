@@ -215,13 +215,13 @@ Hooks are specific callbacks that are called during parsing request. The main di
     public_root = ./public;
     uploads_root = ./public/uploads;
 
-# Memory management
+## Memory management
 
 Cosmonaut follows the principle of a least surprise. Memory is freed only on the same level as it was allocated. So if you're passing chunks of data into any of built-in functions - your code is responsible for clean-up. The same principle is applied to built-in functions - if you're accessing data from params/headers you don't have to free it - the data from built-in data sources would be cleaned up automatically by framework functions which were responsible for allocating it.
 
 # Under the hood
 
-Cosmonaut uses very fast [http-parser](https://github.com/joyent/http-parser) to parse requests and very fast multipart data parser inspired by [node-formidable](https://github.com/felixge/node-formidable) module ported to C.
+Cosmonaut uses very fast [http-parser](https://github.com/joyent/http-parser) to parse requests and very fast [multipart data parser](https://github.com/iafonov/multipart-parser-c) inspired by [node-formidable](https://github.com/felixge/node-formidable) module ported to C.
 
 For now server has the simplest possible networking architecture - it uses `accept` to get connections and forks a new process for each connection. Serving static content implemented using `sendfile` system call to send data directly to socket without buffering.
 
@@ -244,6 +244,6 @@ Application features acceptance test suite built with [cucumber](https://github.
 
 # License & copyright
 
-All code except `src/dict.h`, `src/dict.c` and all code in `deps` folder is released under the [MIT License](www.opensource.org/licenses/mit-license.php).
+All code except `src/dict.h`, `src/dict.c` and all code in `deps` folder is released under the [MIT License](http://www.opensource.org/licenses/mit-license.php).
 
 © 2012 [Igor Afonov](http://iafonov.github.com)
