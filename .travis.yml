@@ -1,0 +1,3 @@
+before_install: "make env"
+install: "make init_submodules"
+script: "make test"
