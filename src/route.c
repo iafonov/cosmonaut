@@ -44,6 +44,7 @@ static void compile(route* route, char *path) {
     die("Cannot compile dynamic matcher for route: %s", path);
   }
   free(regex);
+  free(matcher_re_src);
 
   route->matcher = result;
 }
@@ -90,5 +91,8 @@ route* route_init(char *path, action action) {
 }
 
 void route_free(route* route) {
+  regfree(route->matcher);
+  int i = 0;
+  for (i = 0; i < route->named_params_count; i++) free(route->named_params[i]);
   free(route);
 }

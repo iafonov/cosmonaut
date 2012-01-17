@@ -25,7 +25,7 @@ init_submodules:
 	git submodule update
 
 valgrind:
-	valgrind --tool=memcheck --leak-check=full --show-reachable=yes ./src/cosmonaut
+	valgrind --tool=memcheck --dsymutil=yes --leak-check=full --show-reachable=yes  ./features/test_app/test_app --config ./features/test_app/test_app.conf
 
 .DEFAULT:
 	cd src && $(MAKE) $@
