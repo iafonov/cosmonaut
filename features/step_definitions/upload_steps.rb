@@ -11,6 +11,6 @@ Then /^it should be placed into uploads directory$/ do
 end
 
 Then /^its md5 checksum should match "([^"]*)"$/ do |md5_checksum|
-  p "Uploaded file size is #{File.stat(@uploaded_file_path).size}"
+  sleep(3)
   Digest::MD5.file(@uploaded_file_path).to_s.should == md5_checksum
 end
