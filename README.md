@@ -1,6 +1,6 @@
 # Cosmonaut
 
-Fast web server & micro framework written in C. Just for fun.
+Fast web server & micro framework implemented in C. Just for fun.
 
 The main idea behind cosmonaut - minimalism. It provides only minimal required functionality to process http requests and exposes as much details to application layer as possible. It could be used both as standalone application platform or as an underlying layer for a higher level framework powered by a higher level language.
 
@@ -8,7 +8,7 @@ The main purpose of using it as a standalone application is covering performance
 
 ## Building & installation
 
-Supported platforms: Ubuntu 10.04 (`build-essentials` is required), Mac OS X 10.6, 10.7 (XCode or gcc required). Both static & dynamic libraries are provided.
+Supported platforms: Ubuntu (`build-essentials` is required), Mac OS X 10.6, 10.7 (XCode or gcc required). Both static & dynamic libraries are provided.
 
 1. Clone project
 2. Cross your fingers
@@ -129,18 +129,18 @@ There are several pre-defined rendering helpers - they set correct corresponding
 
 ## Routing
 
-The routing system is very simple and straightforward but at the same time it's very powerful and you can use it as the first stage of routing and then do more tricky rerouting in your own wrapper.
+The routing system is very simple and straightforward but at the same time it's very powerful and you can use it as the first stage of routing and then do some tricky and application specific rerouting in your own wrapper.
 
 ### Simple action mounting
 
-The most simple use-case is binding an action to the route. Whenever user will want to access this path your action would be executed.
+The most simple use-case is binding an action to the route. Whenever user will access this path your action would be executed.
 
     mount("/", action_index);
     mount("/upload_file", action_upload);
 
 ### Parameters capturing
 
-Cosmonaut supports capturing named parameters. Everything between two slashes would be captured and put into the params map with corresponding name.
+Cosmonaut supports capturing named parameters. Everything between two slashes would be captured and put into the params map with the corresponding name.
 
     mount("/photos/(:id)", action_show_photo);
 
@@ -151,7 +151,7 @@ Cosmonaut supports capturing named parameters. Everything between two slashes wo
 
 ### Advanced use cases
 
-As mentioned before routing system could be used as a first stage of the more smart & application specific routing system. Here is use case which demonstrates mounting a RESTful application to a route.
+As mentioned before routing system could be used as the first stage of the more smart & application specific routing system. Here is use case which demonstrates mounting a RESTful application to the route.
 
     mount("/patients/(:id)/(:action)", patients_controller);
 
@@ -166,14 +166,14 @@ As mentioned before routing system could be used as a first stage of the more sm
 
 Examples of paths that would match this route:
 
-    /patients/1/new
-    /patients/1/show
-    /patients/1/edit
-    /patients/1/delete
+    /patients/1/new    // params: {id => 1, action => "new"}
+    /patients/1/show   // params: {id => 1, action => "show"}
+    /patients/1/edit   // params: {id => 1, action => "edit"}
+    /patients/1/delete // params: {id => 1, action => "delete"}
 
 ### Handling 404 errors
 
-If there are no actions that match requested route `[public_root]/404.html` would be rendered and appropriate http response code would be set.
+If there are no actions that match the requested route `[public_root]/404.html` would be rendered and appropriate http response code would be set.
 
 ### Filters
 
@@ -189,7 +189,7 @@ You can set filters by attaching callbacks to routes in your `configure` functio
 
 ### Hooks
 
-Hooks are specific callbacks that are called during parsing request. The main difference of hooks and filters is in their definition & interface - hooks are more specific and filters are more general. For now there is only on hook: `progress_hook` it is called every time after new chunk of data is processed. It passes already parsed amount and content length. It could be used for tracking upload progress and must be setup in route's `before_filter`.
+Hooks are specific callbacks that are called during request parsing process. The main difference between hooks and filters is in their definition & interface - hooks are more specific and filters are more general. For now there is only on hook: `progress_hook` - it is called every time after new chunk of data is processed. It passes already parsed amount and content length. It could be used for tracking upload progress and must be setup in route's `before_filter`.
 
     route* rt = mount("/files/new/(:upload_id)", action_upload);
     rt->before_filter = set_progress_hook;
@@ -217,7 +217,7 @@ Hooks are specific callbacks that are called during parsing request. The main di
 
 ## Memory management
 
-Cosmonaut follows the principle of a least surprise. Memory is freed only on the same level as it was allocated. So if you're passing chunks of data into any of built-in functions - your code is responsible for clean-up. The same principle is applied to built-in functions - if you're accessing data from params/headers you don't have to free it - the data from built-in data sources would be cleaned up automatically by framework functions which were responsible for allocating it.
+Cosmonaut follows the principle of a least surprise. Memory is freed only at the same level as it was allocated. So if you're passing chunks of data into any of built-in functions - your code is responsible for clean-up. The same principle is applied backwards to built-in functions - if you're accessing data from params/headers you don't have to free it, the data from built-in  sources would be cleaned up automatically by framework functions which were responsible for allocating it.
 
 # Under the hood
 
@@ -225,7 +225,7 @@ Cosmonaut uses very fast [http-parser](https://github.com/joyent/http-parser) to
 
 For now server has the simplest possible networking architecture - it uses `accept` to get connections and forks a new process for each connection. Serving static content implemented using `sendfile` system call to send data directly to socket without buffering.
 
-Routing engine is built on dynamically generated and complied during server boot time regular expressions.
+Routing engine is built using regular expressions. Regexes are dynamically generated and complied during server boot time so there is very little overhead during parsing requests.
 
 ## Conventions & project structure
 
