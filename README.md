@@ -1,5 +1,7 @@
 # Cosmonaut
 
+[![Build Status](http://travis-ci.org/iafonov/cosmonaut.png)](http://travis-ci.org/iafonov/cosmonaut.png)
+
 Fast web server & micro framework implemented in C. Just for fun.
 
 The main idea behind cosmonaut - minimalism. It provides only minimal required functionality to process http requests and exposes as much details to application layer as possible. It could be used both as standalone application platform or as an underlying layer for a higher level framework powered by a higher level language.
