@@ -1,5 +1,7 @@
 default: all
 
+travis:
+
 build: default
 
 clean_test_app:
@@ -8,7 +10,14 @@ clean_test_app:
 build_test_app:
 	cd features/test_app && make
 
-test: env clean build install clean_test_app build_test_app
+travis_install:
+	sudo make install
+
+travis: init_submodules env clean build travis_install clean_test_app build_test_app
+	bundle install
+	bundle exec cucumber features/
+
+test: clean build install clean_test_app build_test_app
 	bundle install
 	bundle exec cucumber features/
 

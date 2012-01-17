@@ -1,2 +1,1 @@
-install: "make init_submodules && gem install bundler"
-script: "sudo make test"
+script: "make travis"
