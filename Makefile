@@ -8,7 +8,7 @@ clean_test_app:
 build_test_app:
 	cd features/test_app && make
 
-test: clean build install clean_test_app build_test_app
+test: env clean build install clean_test_app build_test_app
 	bundle install
 	bundle exec cucumber features/
 
