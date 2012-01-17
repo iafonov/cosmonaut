@@ -1,7 +1,7 @@
 #include "/usr/local/include/cosmonaut/cosmonaut.h"
 
 void do_work() {
-  sleep(1);
+  sleep(2);
 }
 
 void action_index(http_request* request, http_response *response) {
