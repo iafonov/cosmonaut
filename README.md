@@ -1,6 +1,6 @@
 # Cosmonaut
 
-[![Build Status](https://travis-ci.org/iafonov/cosmonaut.png)](http://travis-ci.org/iafonov/cosmonaut)
+[![Build Status](https://secure.travis-ci.org/iafonov/cosmonaut.png)](http://travis-ci.org/iafonov/cosmonaut)
 
 Fast web server & micro framework implemented in C. Just for fun.
 
