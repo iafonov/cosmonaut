@@ -59,6 +59,7 @@ void configuration_free() {
   free(config->uploads_root);
 
   regfree(config->param_match_regex);
+  free(config->param_match_regex);
   routes_map_free(config->routes);
 
   free(config);

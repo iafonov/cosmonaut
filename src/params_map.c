@@ -58,8 +58,8 @@ static dictType params_dict = {
 
 param_entry* param_entry_init(char *name, char *val, bool is_file) {
   param_entry* p = malloc(sizeof(param_entry));
-  p->name = name == NULL ? NULL : strdup(name);
-  p->val = val == NULL ? NULL : strdup(val);
+  p->name = name == NULL ? NULL : name;
+  p->val = val == NULL ? NULL : val;
   p->is_file = is_file;
 
   return p;
@@ -101,7 +101,9 @@ void params_map_add(params_map *p_map, param_entry* param) {
 }
 
 void params_map_add_str(params_map *p_map, char* name, char *value) {
-  params_map_add(p_map, param_entry_init(name, value, false));
+  param_entry* p = param_entry_init(name, value, false);
+  params_map_add(p_map, p);
+  free(p);
 }
 
 char* params_map_serialize(params_map *p_map) {
