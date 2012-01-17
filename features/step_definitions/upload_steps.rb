@@ -11,6 +11,6 @@ Then /^it should be placed into uploads directory$/ do
 end
 
 Then /^its md5 checksum should match "([^"]*)"$/ do |md5_checksum|
-  sleep(3)
+  sleep(5) if ENV['TRAVIS']
   Digest::MD5.file(@uploaded_file_path).to_s.should == md5_checksum
 end
