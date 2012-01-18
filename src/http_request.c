@@ -23,6 +23,7 @@ struct http_request_state {
   char* _last_header_name;
   int parsed;
   int content_length;
+  int socket_fd;
 };
 
 // http parser callbacks
@@ -31,13 +32,15 @@ static int header_field_cb(http_parser *p, const char *buf, size_t len);
 static int header_value_cb(http_parser *p, const char *buf, size_t len);
 static int body_cb(http_parser *p, const char *buf, size_t len);
 static int headers_complete_cb(http_parser *p);
+static int message_complete_cb(http_parser *p);
 
 static http_parser_settings settings = {
   .on_header_field = header_field_cb,
   .on_header_value = header_value_cb,
   .on_url = request_url_cb,
   .on_body = body_cb,
-  .on_headers_complete = headers_complete_cb
+  .on_headers_complete = headers_complete_cb,
+  .on_message_complete = message_complete_cb
 };
 
 static bool is_multipart(http_request *request) {
@@ -126,7 +129,18 @@ static int body_cb(http_parser *p, const char *buf, size_t len) {
   return 0;
 }
 
-http_request* http_request_init() {
+static int message_complete_cb(http_parser *p) {
+  http_request* request = (http_request*)p->data;
+
+  http_response* response = http_response_init();
+  routing_engine_execute_action(request, response);
+  http_response_send(response, request->_s->socket_fd);
+  http_response_free(response);
+
+  return 0;
+}
+
+http_request* http_request_init(int socket_fd) {
   http_request* request = malloc(sizeof(http_request));
 
   request->headers = headers_map_init();
@@ -140,6 +154,7 @@ http_request* http_request_init() {
   request->_s->free_body_parser_func = NULL;
   request->_s->parsed = 0;
   request->_s->content_length = 0;
+  request->_s->socket_fd = socket_fd;
 
   return request;
 }
@@ -164,7 +179,25 @@ char* http_request_uploads_path(http_request* request) {
   return result;
 }
 
-void http_request_parse(http_request* request, int socket_fd) {
+int recvtimeout(int s, char *buf, int len, int timeout) {
+  fd_set fds;
+  int n;
+  struct timeval tv;
+
+  FD_ZERO(&fds);
+  FD_SET(s, &fds);
+
+  tv.tv_sec = timeout;
+  tv.tv_usec = 0;
+
+  n = select(s + 1, &fds, NULL, NULL, &tv);
+  if (n == 0) return -2;  // timeout
+  if (n == -1) return -1; // error
+
+  return recv(s, buf, len, 0);
+}
+
+void http_request_handle(http_request* request) {
   char request_buffer[DATA_CHUNK_SIZE];
   int received = 0;
 
@@ -172,9 +205,15 @@ void http_request_parse(http_request* request, int socket_fd) {
   http_parser_init(parser, HTTP_REQUEST);
   parser->data = request;
 
-  while ((received = recv(socket_fd, &request_buffer, DATA_CHUNK_SIZE, 0))) {
-    http_parser_execute(parser, &settings, request_buffer, received);
-    if (received < DATA_CHUNK_SIZE) break;
+  while ((received = recvtimeout(request->_s->socket_fd, (char *)&request_buffer, DATA_CHUNK_SIZE, 1))) {
+    if (received == -1) {
+      perror("recvtimeout error");
+    } else if (received == -2) {
+      info("let's wait -- mmmkay");
+    } else {
+      info("%s", request_buffer);
+      http_parser_execute(parser, &settings, request_buffer, received);
+    }
   }
 
   free(parser);

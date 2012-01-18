@@ -16,6 +16,7 @@ typedef struct http_response {
 
 http_response* http_response_init();
 void http_response_free(http_response* response);
+void http_response_send(http_response* response, int socket_fd);
 
 char* http_response_serialize_headers(http_response* response);
 

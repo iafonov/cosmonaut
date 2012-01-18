@@ -28,9 +28,9 @@ struct http_request {
   http_request_state* _s;
 };
 
-http_request* http_request_init();
+http_request* http_request_init(int socket_fd);
 char* http_request_uploads_path(http_request* request);
 void http_request_free(http_request* request);
-void http_request_parse(http_request* request, int socket_fd);
+void http_request_handle(http_request* request);
 
 #endif
