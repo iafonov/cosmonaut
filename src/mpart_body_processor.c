@@ -107,7 +107,6 @@ static int part_data_end_cb(multipart_parser* p) {
 
   params_map_add(request->params, processor->_current_param);
 
-  param_entry_free(processor->_current_param);
   headers_map_free(processor->part_headers);
   return 0;
 }

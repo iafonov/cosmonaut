@@ -17,40 +17,21 @@ static unsigned int hash_cb(const void *key) {
   return dictGenHashFunction((unsigned char*)key, strlen((char*)key));
 }
 
-static void *key_dup_cb(void *privdata, const void *src) {
-  return strdup((char *)src);
-}
-
-static void *val_dup_cb(void *privdata, const void *src) {
-  const param_entry* src_param = (param_entry *)src;
-  param_entry *dup = malloc(sizeof(param_entry));
-
-  dup->name = str_safe_dup(src_param->name);
-  dup->val = str_safe_dup(src_param->val);
-  dup->file = src_param->file;
-  dup->is_file = src_param->is_file;
-
-  return dup;
-}
-
 static int key_comapre_cb(void *privdata, const void *key1, const void *key2) {
   return strcmp((char *)key1, (char *)key2) == 0;
 }
 
 static void key_destructor_cb(void *privdata, void *key) {
-  free(key);
 }
 
 static void val_destructor_cb(void *privdata, void *val) {
-  free(((param_entry *)val)->val);
-  free(((param_entry *)val)->name);
-  free(val);
+  param_entry_free(val);
 }
 
 static dictType params_dict = {
   hash_cb,
-  key_dup_cb,
-  val_dup_cb,
+  NULL,
+  NULL,
   key_comapre_cb,
   key_destructor_cb,
   val_destructor_cb
@@ -58,8 +39,8 @@ static dictType params_dict = {
 
 param_entry* param_entry_init(char *name, char *val, bool is_file) {
   param_entry* p = malloc(sizeof(param_entry));
-  p->name = name == NULL ? NULL : name;
-  p->val = val == NULL ? NULL : val;
+  p->name = name == NULL ? NULL : str_safe_dup(name);
+  p->val = val == NULL ? NULL : str_safe_dup(val);
   p->is_file = is_file;
 
   return p;
@@ -103,7 +84,6 @@ void params_map_add(params_map *p_map, param_entry* param) {
 void params_map_add_str(params_map *p_map, char* name, char *value) {
   param_entry* p = param_entry_init(name, value, false);
   params_map_add(p_map, p);
-  free(p);
 }
 
 char* params_map_serialize(params_map *p_map) {
