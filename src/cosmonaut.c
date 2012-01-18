@@ -7,7 +7,7 @@ sig_atomic_t server_socket_fd;
 
 #include "log.h"
 #include "signals.h"
-#include "networking.h"
+#include "net.h"
 #include "base_request_handler.h"
 #include "configuration.h"
 #include "action.h"
@@ -22,11 +22,11 @@ int cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
     config_cb();
   }
 
-  server_socket_fd = bind_server_socket_fd();
+  server_socket_fd = net_bind_socket();
   setup_signal_listeners(server_socket_fd);
 
   while(1) {
-    new_connection_fd = accept_connection();
+    new_connection_fd = net_accept_connection();
 
     if (!fork()) {
       srand(getpid());

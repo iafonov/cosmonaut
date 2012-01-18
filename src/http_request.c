@@ -8,6 +8,7 @@
 #include "configuration.h"
 #include "attrs_map.h"
 #include "mpart_body_processor.h"
+#include "net.h"
 
 #include "../deps/multipart-parser-c/multipart_parser.h"
 #include "../deps/http_parser/http_parser.h"
@@ -132,8 +133,8 @@ static int body_cb(http_parser *p, const char *buf, size_t len) {
 static int message_complete_cb(http_parser *p) {
   http_request* request = (http_request*)p->data;
 
-  http_response* response = http_response_init();
   routing_engine_execute_action(request, response);
+  http_response* response = http_response_init();
   http_response_send(response, request->_s->socket_fd);
   http_response_free(response);
 
@@ -179,24 +180,6 @@ char* http_request_uploads_path(http_request* request) {
   return result;
 }
 
-int recvtimeout(int s, char *buf, int len, int timeout) {
-  fd_set fds;
-  int n;
-  struct timeval tv;
-
-  FD_ZERO(&fds);
-  FD_SET(s, &fds);
-
-  tv.tv_sec = timeout;
-  tv.tv_usec = 0;
-
-  n = select(s + 1, &fds, NULL, NULL, &tv);
-  if (n == 0) return -2;  // timeout
-  if (n == -1) return -1; // error
-
-  return recv(s, buf, len, 0);
-}
-
 void http_request_handle(http_request* request) {
   char request_buffer[DATA_CHUNK_SIZE];
   int received = 0;
@@ -205,7 +188,7 @@ void http_request_handle(http_request* request) {
   http_parser_init(parser, HTTP_REQUEST);
   parser->data = request;
 
-  while ((received = recvtimeout(request->_s->socket_fd, (char *)&request_buffer, DATA_CHUNK_SIZE, 1))) {
+  while ((received = net_recv(request->_s->socket_fd, (char *)&request_buffer, DATA_CHUNK_SIZE, 1))) {
     if (received == -1) {
       perror("recvtimeout error");
     } else if (received == -2) {

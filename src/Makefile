@@ -20,7 +20,7 @@ OBJ = ../deps/url_parser/url.o \
       http_response.o \
       base_request_handler.o \
       configuration.o \
-      networking.o \
+      net.o \
       signals.o \
       string_util.o \
       http_request.o \

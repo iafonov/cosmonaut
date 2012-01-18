@@ -1,6 +1,6 @@
 #include "log.h"
 #include "configuration.h"
-#include "networking.h"
+#include "net.h"
 #include "string_util.h"
 #include "../deps/iniparser/iniparser.h"
 
@@ -33,7 +33,7 @@ void configuration_init(int argc, char *argv[]) {
 
   info("loading configuration from %s", config->config_path);
   dictionary *d = iniparser_load(config->config_path);
-  char* server_hostname = determine_server_hostname();
+  char* server_hostname = net_get_hostname();
 
   config->server_port = get_str_val(d, "network:port", "31337");
   config->server_name = get_str_val(d, "network:server_name", server_hostname);

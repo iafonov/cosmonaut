@@ -5,7 +5,7 @@
 #include <netdb.h>
 #include <signal.h>
 
-#include "networking.h"
+#include "net.h"
 #include "configuration.h"
 #include "string_util.h"
 #include "log.h"
@@ -14,18 +14,18 @@
 
 extern sig_atomic_t server_socket_fd;
 
-void reset_hints(struct addrinfo *hints, int ai_flags) {
+static void reset_hints(struct addrinfo *hints, int ai_flags) {
   memset(hints, 0, sizeof *hints);
   hints->ai_family   = AF_UNSPEC;      // v4/v6
   hints->ai_socktype = SOCK_STREAM;    // TCP stream sockets
   hints->ai_flags    = ai_flags;     // fill in my IP for me
 }
 
-void *get_in_addr(struct sockaddr *sa) {
+static void *get_in_addr(struct sockaddr *sa) {
   return &(((struct sockaddr_in*)sa)->sin_addr);
 }
 
-char *determine_server_hostname() {
+char *net_get_hostname() {
   struct addrinfo hints, *info;
 
   char *hostname = malloc_str(HOSTNAME_MAX_LEN);
@@ -45,7 +45,7 @@ char *determine_server_hostname() {
   return canon_hostname;
 }
 
-int bind_server_socket_fd() {
+int net_bind_socket() {
   int status;
   struct sockaddr_storage;
   struct addrinfo hints;
@@ -75,7 +75,7 @@ int bind_server_socket_fd() {
   return server_socket_fd;
 }
 
-int accept_connection() {
+int net_accept_connection() {
   int new_fd;
   struct sockaddr their_addr;
   socklen_t addr_size = sizeof their_addr;
@@ -87,4 +87,22 @@ int accept_connection() {
   info("serving request from %s", s);
 
   return new_fd;
+}
+
+int net_recv(int s, char *buf, int len, int timeout) {
+  fd_set fds;
+  int n;
+  struct timeval tv;
+
+  FD_ZERO(&fds);
+  FD_SET(s, &fds);
+
+  tv.tv_sec = timeout;
+  tv.tv_usec = 0;
+
+  n = select(s + 1, &fds, NULL, NULL, &tv);
+  if (n == 0) return -2;  // timeout
+  if (n == -1) return -1; // error
+
+  return recv(s, buf, len, 0);
 }
