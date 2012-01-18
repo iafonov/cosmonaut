@@ -119,3 +119,10 @@ char* str_random(int len) {
   s[len] = 0;
   return s;
 }
+
+void str_sanitize(char *str) {
+  int i = 0;
+  for (i = 0; i < strlen(str); i++) {
+    if (isspace(str[i])) str[i] = '_';
+  }
+}

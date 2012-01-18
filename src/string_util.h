@@ -13,6 +13,8 @@ char *str_trim(char *str);
 
 void skip_spaces(char **ptr);
 
+void str_sanitize(char *str);
+
 // very unsafe
 char* create_str_from_int(int i);
 

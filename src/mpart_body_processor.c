@@ -65,6 +65,9 @@ static int headers_complete_cb(multipart_parser* p) {
 
     char* name = attrs_map_get(cd_attrs_map, "name");
     char* filename = attrs_map_get(cd_attrs_map, "filename");
+    info("BEFORE %s", filename);
+    str_sanitize(filename);
+    info("AFTER %s", filename);
     bool is_file = (filename != NULL);
 
     processor->_current_param = param_entry_init(name, NULL, is_file);
@@ -75,6 +78,7 @@ static int headers_complete_cb(multipart_parser* p) {
 
       char *file_path = malloc_str(strlen(upload_folder_path) + strlen("/") + strlen(filename));
       sprintf(file_path, "%s/%s", upload_folder_path, filename);
+
       processor->_current_param->file = fopen(file_path, "a");
 
       free(upload_folder_path);
