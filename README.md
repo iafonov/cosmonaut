@@ -43,6 +43,8 @@ Server lifecycle is very simple and straightforward:
       return cosmonaut_start(argc, argv, configure);
     }
 
+More advanced example is available [here](https://github.com/iafonov/uploader_app).
+
 ## Action
 
 Action is a simple function that accepts `http_request` and `http_response` structs as parameters and fills the last one with the data according to the request data.
