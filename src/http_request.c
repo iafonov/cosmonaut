@@ -9,6 +9,7 @@
 #include "attrs_map.h"
 #include "mpart_body_processor.h"
 #include "net.h"
+#include "routing_engine.h"
 
 #include "../deps/multipart-parser-c/multipart_parser.h"
 #include "../deps/http_parser/http_parser.h"
@@ -133,8 +134,8 @@ static int body_cb(http_parser *p, const char *buf, size_t len) {
 static int message_complete_cb(http_parser *p) {
   http_request* request = (http_request*)p->data;
 
-  routing_engine_execute_action(request, response);
   http_response* response = http_response_init();
+  routing_engine_execute_action(request, response);
   http_response_send(response, request->_s->socket_fd);
   http_response_free(response);
 
