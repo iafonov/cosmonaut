@@ -189,13 +189,13 @@ void http_request_handle(http_request* request) {
   http_parser_init(parser, HTTP_REQUEST);
   parser->data = request;
 
-  while ((received = net_recv(request->_s->socket_fd, (char *)&request_buffer, DATA_CHUNK_SIZE, 1))) {
+  while ((received = net_recv(request->_s->socket_fd, (char *)&request_buffer, DATA_CHUNK_SIZE, 2))) {
     if (received == -1) {
       perror("recvtimeout error");
     } else if (received == -2) {
-      info("let's wait -- mmmkay");
+      // like in 1999 - we don't support keep-alive for now :((
+      break;
     } else {
-      info("%s", request_buffer);
       http_parser_execute(parser, &settings, request_buffer, received);
     }
   }
