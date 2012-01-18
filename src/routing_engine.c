@@ -21,5 +21,4 @@ void routing_engine_execute_action(http_request *request, http_response *respons
   }
 
   free(relative_file_path);
-
 }

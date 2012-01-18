@@ -22,7 +22,8 @@ typedef void (*free_body_parser) (void *);
 struct http_request_state {
   void *body_processor;
   free_body_parser free_body_parser_func;
-  char * _last_header_name;
+
+  char *last_header_name;
   int parsed;
   int content_length;
   int socket_fd;
@@ -81,7 +82,7 @@ static int request_url_cb(http_parser *p, const char *buf, size_t len) {
 static int header_field_cb(http_parser *p, const char *buf, size_t len) {
   http_request *request = (http_request *)p->data;
 
-  request->_s->_last_header_name = extract_from_buffer(buf, len);
+  request->_s->last_header_name = extract_from_buffer(buf, len);
   return 0;
 }
 
@@ -89,8 +90,8 @@ static int header_value_cb(http_parser *p, const char *buf, size_t len) {
   http_request *request = (http_request *)p->data;
 
   char *header_value = extract_from_buffer(buf, len);
-  headers_map_add(request->headers, request->_s->_last_header_name, header_value);
-  free(request->_s->_last_header_name);
+  headers_map_add(request->headers, request->_s->last_header_name, header_value);
+  free(request->_s->last_header_name);
   free(header_value);
   return 0;
 }

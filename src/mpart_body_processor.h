@@ -12,8 +12,8 @@ typedef struct mpart_body_processor {
 
   // headers of current part - don't try to use it outside callbacks it's reset on every part
   headers_map *part_headers;
-  char * _last_header_name;
-  param_entry * _current_param;
+  char *last_header_name;
+  param_entry *current_param;
 } mpart_body_processor;
 
 mpart_body_processor *mpart_body_processor_init(http_request *request);

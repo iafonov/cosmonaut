@@ -37,7 +37,7 @@ static char *copy_chunk_from_buffer(const char *buf, size_t len) {
 static int header_field_cb(multipart_parser *p, const char *buf, size_t len) {
   mpart_body_processor *processor = (mpart_body_processor *)p->data;
 
-  processor->_last_header_name = copy_chunk_from_buffer(buf, len);
+  processor->last_header_name = copy_chunk_from_buffer(buf, len);
 
   return 0;
 }
@@ -46,8 +46,8 @@ static int header_value_cb(multipart_parser *p, const char *buf, size_t len) {
   mpart_body_processor *processor = (mpart_body_processor *)p->data;
 
   char *header_value = copy_chunk_from_buffer(buf, len);
-  headers_map_add(processor->part_headers, processor->_last_header_name, header_value);
-  free(processor->_last_header_name);
+  headers_map_add(processor->part_headers, processor->last_header_name, header_value);
+  free(processor->last_header_name);
   free(header_value);
 
   return 0;
@@ -65,12 +65,11 @@ static int headers_complete_cb(multipart_parser *p) {
 
     char *name = attrs_map_get(cd_attrs_map, "name");
     char *filename = attrs_map_get(cd_attrs_map, "filename");
-    info("BEFORE %s", filename);
-    str_sanitize(filename);
-    info("AFTER %s", filename);
     bool is_file = (filename != NULL);
 
-    processor->_current_param = param_entry_init(name, NULL, is_file);
+    str_sanitize(filename);
+
+    processor->current_param = param_entry_init(name, NULL, is_file);
 
     if (is_file) {
       char *upload_folder_path = http_request_uploads_path(request);
@@ -79,7 +78,7 @@ static int headers_complete_cb(multipart_parser *p) {
       char *file_path = malloc_str(strlen(upload_folder_path) + strlen("/") + strlen(filename));
       sprintf(file_path, "%s/%s", upload_folder_path, filename);
 
-      processor->_current_param->file = fopen(file_path, "a");
+      processor->current_param->file = fopen(file_path, "a");
 
       free(upload_folder_path);
       free(file_path);
@@ -93,7 +92,7 @@ static int headers_complete_cb(multipart_parser *p) {
 static int part_data_cb(multipart_parser *p, const char *buf, size_t len) {
   if (len != 0) {
     mpart_body_processor *processor = (mpart_body_processor *)p->data;
-    param_entry_append(processor->_current_param, buf, len);
+    param_entry_append(processor->current_param, buf, len);
   }
   return 0;
 }
@@ -109,7 +108,7 @@ static int part_data_end_cb(multipart_parser *p) {
   mpart_body_processor *processor = (mpart_body_processor *)p->data;
   http_request *request = (http_request *)processor->request;
 
-  params_map_add(request->params, processor->_current_param);
+  params_map_add(request->params, processor->current_param);
 
   headers_map_free(processor->part_headers);
   return 0;
@@ -133,7 +132,6 @@ static char *get_boundary(http_request *request) {
   return boundary;
 }
 
-// public api
 mpart_body_processor *mpart_body_processor_init(http_request *request) {
   mpart_body_processor *processor = malloc(sizeof(mpart_body_processor));
   char *boundary = get_boundary(request);
@@ -141,7 +139,7 @@ mpart_body_processor *mpart_body_processor_init(http_request *request) {
   processor->request = request;
   processor->parser = init_multipart_parser(boundary, &settings);
   processor->parser->data = processor;
-  processor->_current_param = NULL;
+  processor->current_param = NULL;
 
   free(boundary);
   return processor;

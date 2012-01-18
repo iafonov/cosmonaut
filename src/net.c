@@ -18,7 +18,7 @@ static void reset_hints(struct addrinfo *hints, int ai_flags) {
   memset(hints, 0, sizeof *hints);
   hints->ai_family   = AF_UNSPEC;      // v4/v6
   hints->ai_socktype = SOCK_STREAM;    // TCP stream sockets
-  hints->ai_flags    = ai_flags;     // fill in my IP for me
+  hints->ai_flags    = ai_flags;       // fill in my IP for me
 }
 
 static void *get_in_addr(struct sockaddr *sa) {
