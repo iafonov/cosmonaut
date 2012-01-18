@@ -10,7 +10,7 @@
 #include "log.h"
 
 void routing_engine_execute_action(http_request *request, http_response *response) {
-  char* relative_file_path = configuration_convert_path_to_local(request->url->path);
+  char *relative_file_path = configuration_convert_path_to_local(request->url->path);
 
   if (file_exists(relative_file_path)) {
     action_static_file(request, response);

@@ -7,9 +7,9 @@
 #define DEFAULT_CONFIG_FILE "./config/cosmonaut.conf"
 #define URL_NAMED_PARAM_PATTERN "\\(:([^/]*)\\)"
 
-struct configuration* config;
+struct configuration *config;
 
-static char* get_str_val(dictionary *d, char *prop_name, char *default_value) {
+static char *get_str_val(dictionary *d, char *prop_name, char *default_value) {
   char *value = iniparser_getstring(d, prop_name, default_value);
 
   char *config_str_ptr = malloc(strlen(value) + 1);
@@ -33,7 +33,7 @@ void configuration_init(int argc, char *argv[]) {
 
   info("loading configuration from %s", config->config_path);
   dictionary *d = iniparser_load(config->config_path);
-  char* server_hostname = net_get_hostname();
+  char *server_hostname = net_get_hostname();
 
   config->server_port = get_str_val(d, "network:port", "31337");
   config->server_name = get_str_val(d, "network:server_name", server_hostname);
@@ -65,17 +65,17 @@ void configuration_free() {
   free(config);
 }
 
-configuration* configuration_get() {
+configuration *configuration_get() {
   return config;
 }
 
-char* configuration_convert_path_to_local(const char* request_path) {
+char *configuration_convert_path_to_local(const char *request_path) {
   char *relative_path = malloc_str(strlen(configuration_get()->public_root) + strlen("/") + strlen(request_path));
   sprintf(relative_path, "%s/%s", configuration_get()->public_root, request_path);
 
   return relative_path;
 }
 
-route* mount(char* path, action action_cb) {
+route *mount(char *path, action action_cb) {
   return routes_map_add(config->routes, path, action_cb);
 }

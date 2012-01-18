@@ -6,8 +6,8 @@
 
 #include "../deps/url_parser/url.h"
 
-static url* copy_from_parsed_url(parsed_url* parsed_url) {
-  url* result = malloc(sizeof(url));
+static url *copy_from_parsed_url(parsed_url *parsed_url) {
+  url *result = malloc(sizeof(url));
 
   result->scheme   = str_safe_dup(parsed_url->scheme);
   result->host     = str_safe_dup(parsed_url->host);
@@ -21,17 +21,17 @@ static url* copy_from_parsed_url(parsed_url* parsed_url) {
   return result;
 }
 
-url* url_init(char *raw_url) {
+url *url_init(char *raw_url) {
   parsed_url *parsed_url = parse_url(raw_url);
 
-  url* result = copy_from_parsed_url(parsed_url);
+  url *result = copy_from_parsed_url(parsed_url);
 
   free_parsed_url(parsed_url);
   
   return result;
 }
 
-void url_free(url* url) {
+void url_free(url *url) {
   free(url->scheme);
   free(url->host);
   free(url->port);

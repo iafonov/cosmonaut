@@ -1,6 +1,6 @@
 #ifndef _base_request_handler_h
 #define _base_request_handler_h
 
-void handle_request(int new_socket_fd);
+void request_handler_handle(int new_socket_fd);
 
 #endif

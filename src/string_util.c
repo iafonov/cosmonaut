@@ -6,8 +6,8 @@
 
 #include "string_util.h"
 
-char* malloc_str(size_t len) {
-  char* ptr = malloc(len + 1);
+char *malloc_str(size_t len) {
+  char *ptr = malloc(len + 1);
   memset(ptr, 0, len + 1);
   ptr[len] = '\0';
 
@@ -38,8 +38,8 @@ int str_pos(char *str, char *chr)
    return -1;
 }
 
-char* create_str_from_int(int i) {
-  char* result = malloc_str(2 + (i / 100));
+char *create_str_from_int(int i) {
+  char *result = malloc_str(2 + (i / 100));
   sprintf(result, "%d", i);
 
   return result;
@@ -103,11 +103,11 @@ char *str_concat(char *str1, char *str2) {
   return result;
 }
 
-char* str_safe_dup(char *src) {
+char *str_safe_dup(char *src) {
   return (src == NULL) ? NULL : strdup(src);
 }
 
-char* str_random(int len) {
+char *str_random(int len) {
   static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   char *s = malloc(len + 1);
   int i = 0;

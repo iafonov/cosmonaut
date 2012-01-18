@@ -8,8 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 
-struct timeval* stopwatch_time();
-void stopwatch_stop(struct timeval* end_time);
+struct timeval *stopwatch_time();
+void stopwatch_stop(struct timeval *end_time);
 
 #ifdef NDEBUG
 #define debug(M, ...)

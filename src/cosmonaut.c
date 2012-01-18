@@ -8,7 +8,7 @@ sig_atomic_t server_socket_fd;
 #include "log.h"
 #include "signals.h"
 #include "net.h"
-#include "base_request_handler.h"
+#include "request_handler.h"
 #include "configuration.h"
 #include "action.h"
 #include "cosmonaut.h"
@@ -30,11 +30,11 @@ int cosmonaut_start(int argc, char *argv[], configure_app_cb config_cb) {
 
     if (!fork()) {
       srand(getpid());
-      struct timeval* start_time = stopwatch_time();
+      struct timeval *start_time = stopwatch_time();
 
       close(server_socket_fd);
 
-      handle_request(new_connection_fd);
+      request_handler_handle(new_connection_fd);
 
       configuration_free();
 

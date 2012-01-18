@@ -15,22 +15,22 @@ typedef struct http_request_state http_request_state;
 typedef void (*progress_hook)(http_request *request, int content_length, int parsed);
 
 struct http_request {
-  url* url;
-  headers_map* headers;
-  params_map* params;
-  struct configuration* configuration;
-  struct route* route;
+  url *url;
+  headers_map *headers;
+  params_map *params;
+  struct configuration *configuration;
+  struct route *route;
   void *data;
 
   progress_hook progress_hook;
 
-  char* uid;
-  http_request_state* _s;
+  char *uid;
+  http_request_state * _s;
 };
 
-http_request* http_request_init(int socket_fd);
-char* http_request_uploads_path(http_request* request);
-void http_request_free(http_request* request);
-void http_request_handle(http_request* request);
+http_request *http_request_init(int socket_fd);
+char *http_request_uploads_path(http_request *request);
+void http_request_free(http_request *request);
+void http_request_handle(http_request *request);
 
 #endif

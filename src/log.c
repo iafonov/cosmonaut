@@ -3,15 +3,15 @@
 
 #include "log.h"
 
-struct timeval* stopwatch_time() {
-  struct timeval* tv_time = malloc(sizeof(struct timeval));
+struct timeval *stopwatch_time() {
+  struct timeval *tv_time = malloc(sizeof(struct timeval));
   gettimeofday(tv_time, NULL);
 
   return tv_time;
 }
 
-void stopwatch_stop(struct timeval* start_time) {
-  struct timeval* end_time = stopwatch_time();
+void stopwatch_stop(struct timeval *start_time) {
+  struct timeval *end_time = stopwatch_time();
   unsigned long msec;
 
   msec = (end_time->tv_sec - start_time->tv_sec) * 1000;

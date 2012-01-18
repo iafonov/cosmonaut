@@ -9,13 +9,13 @@
 #include "configuration.h"
 #include "log.h"
 
-static int header_field_cb(multipart_parser* p, const char *buf, size_t len);
-static int header_value_cb(multipart_parser* p, const char *buf, size_t len);
-static int part_data_cb(multipart_parser* p, const char *buf, size_t len);
-static int part_data_begin_cb(multipart_parser* p);
-static int headers_complete_cb(multipart_parser* p);
-static int part_data_end_cb(multipart_parser* p);
-static int body_end_cb(multipart_parser* p);
+static int header_field_cb(multipart_parser *p, const char *buf, size_t len);
+static int header_value_cb(multipart_parser *p, const char *buf, size_t len);
+static int part_data_cb(multipart_parser *p, const char *buf, size_t len);
+static int part_data_begin_cb(multipart_parser *p);
+static int headers_complete_cb(multipart_parser *p);
+static int part_data_end_cb(multipart_parser *p);
+static int body_end_cb(multipart_parser *p);
 
 static multipart_parser_settings settings = {
   .on_header_field = header_field_cb,
@@ -27,23 +27,23 @@ static multipart_parser_settings settings = {
   .on_body_end = body_end_cb
 };
 
-static char* copy_chunk_from_buffer(const char *buf, size_t len) {
+static char *copy_chunk_from_buffer(const char *buf, size_t len) {
   char *field = malloc_str(len);
   strncat(field, buf, len);
 
   return field;
 }
 
-static int header_field_cb(multipart_parser* p, const char *buf, size_t len) {
-  mpart_body_processor* processor = (mpart_body_processor*)p->data;
+static int header_field_cb(multipart_parser *p, const char *buf, size_t len) {
+  mpart_body_processor *processor = (mpart_body_processor *)p->data;
 
   processor->_last_header_name = copy_chunk_from_buffer(buf, len);
 
   return 0;
 }
 
-static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
-  mpart_body_processor* processor = (mpart_body_processor*)p->data;
+static int header_value_cb(multipart_parser *p, const char *buf, size_t len) {
+  mpart_body_processor *processor = (mpart_body_processor *)p->data;
 
   char *header_value = copy_chunk_from_buffer(buf, len);
   headers_map_add(processor->part_headers, processor->_last_header_name, header_value);
@@ -53,18 +53,18 @@ static int header_value_cb(multipart_parser* p, const char *buf, size_t len) {
   return 0;
 }
 
-static int headers_complete_cb(multipart_parser* p) {
-  mpart_body_processor* processor = (mpart_body_processor*)p->data;
-  http_request* request = (http_request*)processor->request;
+static int headers_complete_cb(multipart_parser *p) {
+  mpart_body_processor *processor = (mpart_body_processor *)p->data;
+  http_request *request = (http_request *)processor->request;
 
-  char* content_disposition = headers_map_get(processor->part_headers, "Content-Disposition");
-  attrs_map* cd_attrs_map = attrs_map_init();
+  char *content_disposition = headers_map_get(processor->part_headers, "Content-Disposition");
+  attrs_map *cd_attrs_map = attrs_map_init();
 
   if (str_starts_with(content_disposition, "form-data;")) {
     attrs_map_parse(cd_attrs_map, content_disposition + strlen("form-data;"));
 
-    char* name = attrs_map_get(cd_attrs_map, "name");
-    char* filename = attrs_map_get(cd_attrs_map, "filename");
+    char *name = attrs_map_get(cd_attrs_map, "name");
+    char *filename = attrs_map_get(cd_attrs_map, "filename");
     info("BEFORE %s", filename);
     str_sanitize(filename);
     info("AFTER %s", filename);
@@ -90,24 +90,24 @@ static int headers_complete_cb(multipart_parser* p) {
   return 0;
 }
 
-static int part_data_cb(multipart_parser* p, const char *buf, size_t len) {
+static int part_data_cb(multipart_parser *p, const char *buf, size_t len) {
   if (len != 0) {
-    mpart_body_processor* processor = (mpart_body_processor*)p->data;
+    mpart_body_processor *processor = (mpart_body_processor *)p->data;
     param_entry_append(processor->_current_param, buf, len);
   }
   return 0;
 }
 
-static int part_data_begin_cb(multipart_parser* p) {
-  mpart_body_processor* processor = (mpart_body_processor*)p->data;
+static int part_data_begin_cb(multipart_parser *p) {
+  mpart_body_processor *processor = (mpart_body_processor *)p->data;
 
   processor->part_headers = headers_map_init();
   return 0;
 }
 
-static int part_data_end_cb(multipart_parser* p) {
-  mpart_body_processor* processor = (mpart_body_processor*)p->data;
-  http_request* request = (http_request*)processor->request;
+static int part_data_end_cb(multipart_parser *p) {
+  mpart_body_processor *processor = (mpart_body_processor *)p->data;
+  http_request *request = (http_request *)processor->request;
 
   params_map_add(request->params, processor->_current_param);
 
@@ -115,11 +115,11 @@ static int part_data_end_cb(multipart_parser* p) {
   return 0;
 }
 
-static int body_end_cb(multipart_parser* p) {
+static int body_end_cb(multipart_parser *p) {
   return 0;
 }
 
-static char* get_boundary(http_request *request) {
+static char *get_boundary(http_request *request) {
   char *content_type = headers_map_get(request->headers, "Content-Type");
   char *boundary = NULL;
 
@@ -134,8 +134,8 @@ static char* get_boundary(http_request *request) {
 }
 
 // public api
-mpart_body_processor* mpart_body_processor_init(http_request* request) {
-  mpart_body_processor* processor = malloc(sizeof(mpart_body_processor));
+mpart_body_processor *mpart_body_processor_init(http_request *request) {
+  mpart_body_processor *processor = malloc(sizeof(mpart_body_processor));
   char *boundary = get_boundary(request);
 
   processor->request = request;
@@ -147,7 +147,7 @@ mpart_body_processor* mpart_body_processor_init(http_request* request) {
   return processor;
 }
 
-void mpart_body_processor_free(mpart_body_processor* processor) {
+void mpart_body_processor_free(mpart_body_processor *processor) {
   free_multipart_parser(processor->parser);
   free(processor);
 }

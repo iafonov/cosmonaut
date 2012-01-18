@@ -5,15 +5,15 @@
 #include "string_util.h"
 #include "log.h"
 
-headers_map* headers_map_init() {
+headers_map *headers_map_init() {
   return str_map_init();
 }
 
-void headers_map_free(headers_map* h_map) {
+void headers_map_free(headers_map *h_map) {
   str_map_free(h_map);
 }
 
-char* headers_map_get(headers_map *h_map, const char *name) {
+char *headers_map_get(headers_map *h_map, const char *name) {
   return str_map_get(h_map, name);
 }
 
@@ -21,9 +21,9 @@ void headers_map_add(headers_map *h_map, char *name, char *value) {
   str_map_add(h_map, name, value);
 }
 
-char* headers_map_serialize(headers_map *h_map, char* http_header) {
-  dictIterator* dict_iterator;
-  dictEntry* dict_entry;
+char *headers_map_serialize(headers_map *h_map, char *http_header) {
+  dictIterator *dict_iterator;
+  dictEntry *dict_entry;
   char *key, *val, *header_line;
 
   dict_iterator = dictGetIterator(h_map);

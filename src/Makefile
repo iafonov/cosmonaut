@@ -18,7 +18,7 @@ OBJ = ../deps/url_parser/url.o \
 			render.o \
       action.o \
       http_response.o \
-      base_request_handler.o \
+      request_handler.o \
       configuration.o \
       net.o \
       signals.o \

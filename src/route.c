@@ -9,9 +9,9 @@
 #include "string_util.h"
 #include "configuration.h"
 
-static void compile(route* route, char *path) {
+static void compile(route *route, char *path) {
   int status, pos = 0;
-  regex_t* result = malloc(sizeof(regex_t));
+  regex_t *result = malloc(sizeof(regex_t));
   regmatch_t matches[2];
   char *named_param_re_src = "([^/]*)";
   char *matcher_re_src = malloc_str(strlen(path) * 2);
@@ -49,7 +49,7 @@ static void compile(route* route, char *path) {
   route->matcher = result;
 }
 
-bool route_match(route* route, const char *path, params_map* params) {
+bool route_match(route *route, const char *path, params_map *params) {
   regmatch_t matches[route->named_params_count + 1];
 
   int status = regexec(route->matcher, path, route->named_params_count + 1, matches, 0);
@@ -59,7 +59,7 @@ bool route_match(route* route, const char *path, params_map* params) {
     int i = 0;
     for (i = 0; i < route->named_params_count; i++) {
       int length = matches[i + 1].rm_eo - matches[i + 1].rm_so;
-      char* param_value = malloc_str(length);
+      char *param_value = malloc_str(length);
 
       memcpy(param_value, path + matches[i + 1].rm_so, length);
       params_map_add_str(params, route->named_params[i], param_value);
@@ -77,8 +77,8 @@ void route_execute_before_filter(route *route, http_request *request) {
   }
 }
 
-route* route_init(char *path, action action) {
-  route* result = malloc(sizeof(route));
+route *route_init(char *path, action action) {
+  route *result = malloc(sizeof(route));
 
   result->action = action;
   result->before_filter = NULL;
@@ -90,7 +90,7 @@ route* route_init(char *path, action action) {
   return result;
 }
 
-void route_free(route* route) {
+void route_free(route *route) {
   regfree(route->matcher);
   free(route->matcher);
 

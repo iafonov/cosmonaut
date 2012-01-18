@@ -13,8 +13,8 @@
 #include "platform.h"
 #include "log.h"
 
-http_response* http_response_init() {
-  http_response* response = malloc(sizeof(http_response));
+http_response *http_response_init() {
+  http_response *response = malloc(sizeof(http_response));
 
   response->header_summary = NULL;
   response->file_path = NULL;
@@ -26,7 +26,7 @@ http_response* http_response_init() {
   return response;
 }
 
-void http_response_free(http_response* response) {
+void http_response_free(http_response *response) {
   free(response->file_path);
   free(response->content_type);
   free(response->raw_response);
@@ -35,15 +35,15 @@ void http_response_free(http_response* response) {
   free(response);
 }
 
-char* build_header_header(http_response* response) {
-  char* result = malloc_str(3 + strlen("HTTP/1.1 XXX ") + strlen(response->header_summary) + strlen("\n"));
+char *build_header_header(http_response *response) {
+  char *result = malloc_str(3 + strlen("HTTP/1.1 XXX ") + strlen(response->header_summary) + strlen("\n"));
   sprintf(result, "HTTP/1.1 %d %s\n", response->code, response->header_summary);
 
   return result;
 }
 
-void http_response_send(http_response* response, int socket_fd) {
-  char* serialized_headers = http_response_serialize_headers(response);
+void http_response_send(http_response *response, int socket_fd) {
+  char *serialized_headers = http_response_serialize_headers(response);
 
   if (send(socket_fd, serialized_headers, strlen(serialized_headers), 0) == -1) {
     err("can not send headers");
@@ -69,9 +69,9 @@ void http_response_send(http_response* response, int socket_fd) {
   }
 }
 
-char* http_response_serialize_headers(http_response* response) {
-  char* http_header = build_header_header(response);
-  char* content_length = create_str_from_int(response->content_length);
+char *http_response_serialize_headers(http_response *response) {
+  char *http_header = build_header_header(response);
+  char *content_length = create_str_from_int(response->content_length);
 
   headers_map_add(response->headers, "Content-Type", response->content_type);
   headers_map_add(response->headers, "Server", "Cosmonaut/0.0.1");

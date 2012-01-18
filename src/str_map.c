@@ -7,7 +7,7 @@
 
 // dict's callbacks
 static unsigned int hash_cb(const void *key) {
-  return dictGenHashFunction((unsigned char*)key, strlen((char*)key));
+  return dictGenHashFunction((unsigned char *)key, strlen((char *)key));
 }
 
 static void *val_dup_cb(void *privdata, const void *src) {
@@ -39,16 +39,16 @@ static dictType str_dict = {
   val_destructor_cb
 };
 
-str_map* str_map_init() {
+str_map *str_map_init() {
   return dictCreate(&str_dict, NULL);
 }
 
-void str_map_free(str_map* h_map) {
+void str_map_free(str_map *h_map) {
   dictRelease(h_map);
 }
 
-char* str_map_get(str_map *h_map, const char *name) {
-  dictEntry* dict_entry = dictFind(h_map, (void *)name);
+char *str_map_get(str_map *h_map, const char *name) {
+  dictEntry *dict_entry = dictFind(h_map, (void *)name);
   return dict_entry != NULL ? dictGetEntryVal(dict_entry) : NULL;
 }
 

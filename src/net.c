@@ -22,7 +22,7 @@ static void reset_hints(struct addrinfo *hints, int ai_flags) {
 }
 
 static void *get_in_addr(struct sockaddr *sa) {
-  return &(((struct sockaddr_in*)sa)->sin_addr);
+  return &(((struct sockaddr_in *)sa)->sin_addr);
 }
 
 char *net_get_hostname() {

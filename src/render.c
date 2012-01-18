@@ -6,7 +6,7 @@
 
 #define MAP_CONTENT_TYPE(path, ext, content_type) if (str_ends_with(path, ext)) return strdup(content_type);
 
-static char* content_type_by_path(const char *path) {
+static char *content_type_by_path(const char *path) {
   MAP_CONTENT_TYPE(path, "html", "text/html; charset=UTF-8");
   MAP_CONTENT_TYPE(path, "css",  "text/css");
   MAP_CONTENT_TYPE(path, "js",   "application/javascript");
@@ -20,7 +20,7 @@ static char* content_type_by_path(const char *path) {
 }
 
 void render_file(http_response *response, const char *path) {
-  char* relative_file_path = configuration_convert_path_to_local(path);
+  char *relative_file_path = configuration_convert_path_to_local(path);
 
   response->code = 200;
   response->header_summary = "OK";

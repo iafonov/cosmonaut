@@ -11,7 +11,7 @@
 #include "action.h"
 
 static unsigned int hash_cb(const void *key) {
-  return dictGenHashFunction((unsigned char*)key, strlen((char*)key));
+  return dictGenHashFunction((unsigned char *)key, strlen((char *)key));
 }
 
 static int key_comapre_cb(void *privdata, const void *key1, const void *key2) {
@@ -35,7 +35,7 @@ static dictType routes_dict = {
   val_destructor_cb
 };
 
-static char* create_normalized_path(const char *path) {
+static char *create_normalized_path(const char *path) {
   char *result;
 
   if (path[0] == '/') {
@@ -47,19 +47,19 @@ static char* create_normalized_path(const char *path) {
   }
 }
 
-routes_map* routes_map_init() {
+routes_map *routes_map_init() {
   return dictCreate(&routes_dict, NULL);
 }
 
-void routes_map_free(routes_map* rt_map) {
+void routes_map_free(routes_map *rt_map) {
   dictRelease(rt_map);
 }
 
-route* routes_map_match(routes_map *rt_map, const char *path, params_map* params) {
+route *routes_map_match(routes_map *rt_map, const char *path, params_map *params) {
   char *normalized_path = create_normalized_path(path);
 
-  dictIterator* dict_iterator;
-  dictEntry* dict_entry;
+  dictIterator *dict_iterator;
+  dictEntry *dict_entry;
   route *result = NULL;
 
   dict_iterator = dictGetIterator(rt_map);
@@ -77,8 +77,8 @@ route* routes_map_match(routes_map *rt_map, const char *path, params_map* params
   return result;
 }
 
-route* routes_map_add(routes_map *rt_map, char *path, action action) {
-  route* route = route_init(path, action);
+route *routes_map_add(routes_map *rt_map, char *path, action action) {
+  route *route = route_init(path, action);
 
   dictAdd(rt_map, (void *)strdup(path), (void *)route);
 

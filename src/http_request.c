@@ -17,12 +17,12 @@
 #define CR '\r'
 #define LF '\n'
 
-typedef void (*free_body_parser) (void*);
+typedef void (*free_body_parser) (void *);
 
 struct http_request_state {
-  void* body_processor;
+  void *body_processor;
   free_body_parser free_body_parser_func;
-  char* _last_header_name;
+  char * _last_header_name;
   int parsed;
   int content_length;
   int socket_fd;
@@ -49,24 +49,24 @@ static bool is_multipart(http_request *request) {
   return str_starts_with(headers_map_get(request->headers, "Content-Type"), "multipart/form-data");
 }
 
-static char* extract_from_buffer(const char *buf, size_t len) {
+static char *extract_from_buffer(const char *buf, size_t len) {
   char *field = malloc_str(len);
   strncat(field, buf, len);
 
   return field;
 }
 
-static char* construct_url(char *path) {
+static char *construct_url(char *path) {
   int len = strlen("http://") + strlen(configuration_get()->server_name) +
             strlen(":") + strlen(configuration_get()->server_port) + strlen(path);
 
-  char* url = malloc_str(len);
+  char *url = malloc_str(len);
   sprintf(url, "http://%s:%s%s", configuration_get()->server_name, configuration_get()->server_port, path);
   return url;
 }
 
 static int request_url_cb(http_parser *p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
+  http_request *request = (http_request *)p->data;
   char *path = extract_from_buffer(buf, len);
   char *request_url = construct_url(path);
 
@@ -79,14 +79,14 @@ static int request_url_cb(http_parser *p, const char *buf, size_t len) {
 }
 
 static int header_field_cb(http_parser *p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
+  http_request *request = (http_request *)p->data;
 
   request->_s->_last_header_name = extract_from_buffer(buf, len);
   return 0;
 }
 
 static int header_value_cb(http_parser *p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
+  http_request *request = (http_request *)p->data;
 
   char *header_value = extract_from_buffer(buf, len);
   headers_map_add(request->headers, request->_s->_last_header_name, header_value);
@@ -96,8 +96,8 @@ static int header_value_cb(http_parser *p, const char *buf, size_t len) {
 }
 
 static int mpart_body_process(http_parser *p, const char *buf, size_t len) {
-  http_request* request = (http_request*)p->data;
-  mpart_body_processor* processor = (mpart_body_processor*)request->_s->body_processor;
+  http_request *request = (http_request *)p->data;
+  mpart_body_processor *processor = (mpart_body_processor *)request->_s->body_processor;
 
   request->_s->parsed += multipart_parser_execute(processor->parser, buf, len);
 
@@ -109,7 +109,7 @@ static int mpart_body_process(http_parser *p, const char *buf, size_t len) {
 }
 
 static int headers_complete_cb(http_parser *p) {
-  http_request* request = (http_request*)p->data;
+  http_request *request = (http_request *)p->data;
   if (headers_map_get(request->headers, "Content-Length")) {
     request->_s->content_length = atoi(headers_map_get(request->headers, "Content-Length"));
   }
@@ -132,9 +132,9 @@ static int body_cb(http_parser *p, const char *buf, size_t len) {
 }
 
 static int message_complete_cb(http_parser *p) {
-  http_request* request = (http_request*)p->data;
+  http_request *request = (http_request *)p->data;
 
-  http_response* response = http_response_init();
+  http_response *response = http_response_init();
   routing_engine_execute_action(request, response);
   http_response_send(response, request->_s->socket_fd);
   http_response_free(response);
@@ -142,8 +142,8 @@ static int message_complete_cb(http_parser *p) {
   return 0;
 }
 
-http_request* http_request_init(int socket_fd) {
-  http_request* request = malloc(sizeof(http_request));
+http_request *http_request_init(int socket_fd) {
+  http_request *request = malloc(sizeof(http_request));
 
   request->headers = headers_map_init();
   request->params = params_map_init();
@@ -161,7 +161,7 @@ http_request* http_request_init(int socket_fd) {
   return request;
 }
 
-void http_request_free(http_request* request) {
+void http_request_free(http_request *request) {
   if (request->_s->free_body_parser_func != NULL) {
     request->_s->free_body_parser_func(request->_s->body_processor);
   }
@@ -174,18 +174,18 @@ void http_request_free(http_request* request) {
   free(request);
 }
 
-char* http_request_uploads_path(http_request* request) {
-  char* result = malloc_str(strlen(configuration_get()->uploads_root) + strlen("/") + strlen(request->uid));
+char *http_request_uploads_path(http_request *request) {
+  char *result = malloc_str(strlen(configuration_get()->uploads_root) + strlen("/") + strlen(request->uid));
   sprintf(result, "%s/%s", configuration_get()->uploads_root, request->uid);
 
   return result;
 }
 
-void http_request_handle(http_request* request) {
+void http_request_handle(http_request *request) {
   char request_buffer[DATA_CHUNK_SIZE];
   int received = 0;
 
-  http_parser* parser = malloc(sizeof(http_parser));
+  http_parser *parser = malloc(sizeof(http_parser));
   http_parser_init(parser, HTTP_REQUEST);
   parser->data = request;
 

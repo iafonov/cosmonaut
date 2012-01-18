@@ -21,7 +21,7 @@ void sigint_handler(int signal) {
   exit(0);
 }
 
-void set_handler(int signal, void* handler) {
+void set_handler(int signal, void *handler) {
   struct sigaction sa;
   sa.sa_handler = handler;
   sigemptyset(&sa.sa_mask);

@@ -12,7 +12,7 @@ typedef struct url {
   char *password;
 } url;
 
-url* url_init(char *raw_url);
-void url_free(url* url);
+url *url_init(char *raw_url);
+void url_free(url *url);
 
 #endif
