@@ -8,6 +8,8 @@ The main idea behind cosmonaut - minimalism. It provides only minimal required f
 
 The main purpose of using it as a standalone application is covering performance critical sections of application. For example you can use it to power/process your uploads or serve dynamic content which is sensitive to response time.
 
+Also you can get some ideas behind Cosmonaut from [slides](http://speakerdeck.com/u/iafonov/p/web-servers-and-how-i-created-my-own-one) from my talk given on [CnC Donetsk](http://cnc.dn.ua/) meeting.
+
 ## Building & installation
 
 Supported platforms: Ubuntu (`build-essentials` is required), Mac OS X 10.6, 10.7 (XCode or gcc required). Both static & dynamic libraries are provided.
