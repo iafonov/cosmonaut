@@ -1,4 +1,3 @@
-@javascript
 Feature: Routing and params processing
 
 Scenario: Simple routing
