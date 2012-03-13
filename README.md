@@ -246,7 +246,7 @@ Server is built from simple modules. Each module has two required function `modu
 
 ## Testing
 
-Application features acceptance test suite built with [cucumber](https://github.com/cucumber/cucumbe) & [rest-client](https://github.com/archiloque/rest-client). Run `make && make test` to run acceptance test suite. (Requires ruby & bundler)
+Application features acceptance test suite built with [cucumber](https://github.com/cucumber/cucumbe) & [rest-client](https://github.com/archiloque/rest-client). Run `make && make test` to run acceptance test suite. (Requires ruby &amp; bundler)
 
 # License & copyright
 
